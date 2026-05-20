@@ -16,37 +16,6 @@ if (!empty($_SESSION['admin_id'])) {
     <title>Login — BHMS</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
-    <style>
-        .toast-container{
-            position:fixed; top:20px; right:20px; z-index:9999;
-            display:flex; flex-direction:column; gap:10px;
-            max-width:380px; pointer-events:none;
-        }
-        .toast{
-            pointer-events:auto; display:flex; align-items:flex-start; gap:12px;
-            padding:14px 16px; border-radius:10px; background:#fff;
-            box-shadow:0 8px 24px rgba(15,23,42,.15);
-            border-left:4px solid #ef4444; min-width:300px;
-            animation:toastIn .3s ease-out;
-        }
-        .toast-icon{ flex-shrink:0; font-size:24px; color:#ef4444; }
-        .toast-content{ flex:1; min-width:0; }
-        .toast-title{ font-size:14px; font-weight:700; color:#0f172a; margin-bottom:2px; }
-        .toast-message{ font-size:13px; color:#64748b; line-height:1.4; }
-        .toast-close{
-            background:none; border:none; color:#94a3b8; cursor:pointer;
-            padding:2px; flex-shrink:0; border-radius:6px;
-            display:flex; align-items:center;
-        }
-        .toast-close:hover{ background:#f1f5f9; color:#0f172a; }
-        .toast-close .material-icons{ font-size:18px; }
-        @keyframes toastIn{
-            from{ transform:translateX(120%); opacity:0; }
-            to{ transform:translateX(0); opacity:1; }
-        }
-        @keyframes toastOut{ to{ transform:translateX(120%); opacity:0; } }
-        .toast.removing{ animation:toastOut .3s ease-in forwards; }
-    </style>
 </head>
 <body>
 
@@ -195,8 +164,7 @@ if (!empty($_SESSION['admin_id'])) {
         const pwdErr = validatePasswordStrength(password);
         if (pwdErr) {
             e.preventDefault();
-            showToast('Password Requirements', pwdErr +
-                ' Passwords must have 12+ characters with uppercase, lowercase, a number, and a special character.');
+            showToast('Password Requirements', pwdErr);
         }
     });
 </script>

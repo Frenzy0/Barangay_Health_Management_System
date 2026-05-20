@@ -1384,8 +1384,19 @@ body.public-page{
     display:flex;
 }
 
-.account-panel .form-group input[type="password"]{
-    padding:10px 12px;
+/* ===== PASSWORD FIELD + EYE TOGGLE ===== */
+.password-wrap{
+    position:relative;
+    display:flex;
+    width:100%;
+}
+
+.password-wrap input{
+    width:100%;
+}
+
+.account-panel .password-wrap input{
+    padding:10px 42px 10px 12px;
     border:1.5px solid #cbd5e1;
     border-radius:8px;
     font-size:14px;
@@ -1394,10 +1405,33 @@ body.public-page{
     transition:.2s;
 }
 
-.account-panel .form-group input[type="password"]:focus{
+.account-panel .password-wrap input:focus{
     border-color:#0d9488;
     background:#fff;
     box-shadow:0 0 0 3px rgba(13,148,136,.1);
+}
+
+.toggle-pwd{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    background:none;
+    border:none;
+    color:#94a3b8;
+    cursor:pointer;
+    padding:4px;
+    display:flex;
+    align-items:center;
+    line-height:0;
+}
+
+.toggle-pwd:hover{
+    color:#475569;
+}
+
+.toggle-pwd .material-icons{
+    font-size:20px;
 }
 
 /* Activity list */

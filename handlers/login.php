@@ -12,7 +12,8 @@ if (!$username || !$password) {
     exit;
 }
 
-$stmt = $conn->prepare("SELECT id, username, password_hash FROM admins WHERE username = ? LIMIT 1");
+// Case-sensitive username match (binary byte comparison).
+$stmt = $conn->prepare("SELECT id, username, password_hash FROM admins WHERE BINARY username = ? LIMIT 1");
 $stmt->bind_param('s', $username);
 $stmt->execute();
 $admin = $stmt->get_result()->fetch_assoc();

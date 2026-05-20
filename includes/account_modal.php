@@ -54,14 +54,24 @@
                     <span class="material-icons form-icon">lock</span>
                     Current Password <span class="required-star">*</span>
                 </label>
-                <input type="password" id="oldPassword" autocomplete="current-password" placeholder="Enter your current password">
+                <div class="password-wrap">
+                    <input type="password" id="oldPassword" autocomplete="current-password" placeholder="Enter your current password">
+                    <button type="button" class="toggle-pwd" data-target="oldPassword" aria-label="Show password">
+                        <span class="material-icons">visibility</span>
+                    </button>
+                </div>
             </div>
             <div class="form-group full">
                 <label>
                     <span class="material-icons form-icon">key</span>
                     New Password <span class="required-star">*</span>
                 </label>
-                <input type="password" id="newPassword" autocomplete="new-password" placeholder="At least 12 characters">
+                <div class="password-wrap">
+                    <input type="password" id="newPassword" autocomplete="new-password" placeholder="At least 12 characters">
+                    <button type="button" class="toggle-pwd" data-target="newPassword" aria-label="Show password">
+                        <span class="material-icons">visibility</span>
+                    </button>
+                </div>
                 <small style="font-size:12px;color:#94a3b8;margin-top:4px;">Must be 12+ characters with uppercase, lowercase, a number, and a special character.</small>
             </div>
             <div class="form-group full">
@@ -69,7 +79,12 @@
                     <span class="material-icons form-icon">key</span>
                     Confirm New Password <span class="required-star">*</span>
                 </label>
-                <input type="password" id="confirmPassword" autocomplete="new-password" placeholder="Re-enter new password">
+                <div class="password-wrap">
+                    <input type="password" id="confirmPassword" autocomplete="new-password" placeholder="Re-enter new password">
+                    <button type="button" class="toggle-pwd" data-target="confirmPassword" aria-label="Show password">
+                        <span class="material-icons">visibility</span>
+                    </button>
+                </div>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary closeAccountModal">

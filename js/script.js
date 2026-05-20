@@ -1046,6 +1046,19 @@ document.addEventListener("DOMContentLoaded", () => {
             .finally(() => { saveUsernameBtn.disabled = false; });
     });
 
+    // ----- Password visibility toggles (account modal) -----
+    document.querySelectorAll(".toggle-pwd").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const input = document.getElementById(btn.dataset.target);
+            if (!input) return;
+            const icon = btn.querySelector(".material-icons");
+            const show = input.type === "password";
+            input.type = show ? "text" : "password";
+            if (icon) icon.textContent = show ? "visibility_off" : "visibility";
+            btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+        });
+    });
+
     // ----- Change password -----
     const changePasswordBtn = document.getElementById("changePasswordBtn");
     changePasswordBtn?.addEventListener("click", () => {
