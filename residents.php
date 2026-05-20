@@ -122,6 +122,16 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
                     <span class="material-icons">search</span>
                     <input type="text" id="residentSearch" placeholder="Search by name...">
                 </div>
+                <div class="export-group">
+                    <a href="handlers/export_residents.php?format=csv" class="btn btn-export">
+                        <span class="material-icons">table_view</span>
+                        Export CSV
+                    </a>
+                    <a href="handlers/export_residents.php?format=pdf" target="_blank" rel="noopener" class="btn btn-export">
+                        <span class="material-icons">picture_as_pdf</span>
+                        Export PDF
+                    </a>
+                </div>
             </div>
 
             <!-- TABLE -->

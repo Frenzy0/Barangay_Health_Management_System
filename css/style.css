@@ -413,6 +413,31 @@ tbody tr:hover{
     background:#475569;
 }
 
+/* ================= EXPORT BUTTONS ================= */
+.export-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn-export{
+    background:#fff;
+    color:#0d9488;
+    border:1.5px solid #0d9488;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.btn-export:hover{
+    background:#0d9488;
+    color:#fff;
+}
+
+.btn-export .material-icons{
+    font-size:20px;
+}
+
 /* ================= ACTION BUTTONS ================= */
 .action-btns{
     display:flex;
@@ -1913,6 +1938,11 @@ body.public-page{
 
     .search-box{
         width:100%;
+    }
+
+    .export-group .btn-export{
+        flex:1;
+        justify-content:center;
     }
 
     /* Modals */

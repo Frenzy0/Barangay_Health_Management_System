@@ -17,8 +17,20 @@ if (!$old_pwd || !$new_pwd) {
     echo json_encode(['success' => false, 'error' => 'Please provide both old and new passwords.']);
     exit;
 }
-if (strlen($new_pwd) < 6) {
-    echo json_encode(['success' => false, 'error' => 'New password must be at least 6 characters.']);
+$pwd_error = '';
+if (strlen($new_pwd) < 12) {
+    $pwd_error = 'New password must be at least 12 characters long.';
+} elseif (!preg_match('/[a-z]/', $new_pwd)) {
+    $pwd_error = 'New password must include a lowercase letter.';
+} elseif (!preg_match('/[A-Z]/', $new_pwd)) {
+    $pwd_error = 'New password must include an uppercase letter.';
+} elseif (!preg_match('/[0-9]/', $new_pwd)) {
+    $pwd_error = 'New password must include a number.';
+} elseif (!preg_match('/[^A-Za-z0-9]/', $new_pwd)) {
+    $pwd_error = 'New password must include a special character.';
+}
+if ($pwd_error) {
+    echo json_encode(['success' => false, 'error' => $pwd_error]);
     exit;
 }
 

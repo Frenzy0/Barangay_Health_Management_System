@@ -11,7 +11,7 @@ $conn->query("
 ");
 
 $username = 'admin';
-$password = 'admin123';
+$password = 'BhmsAdmin@2026';
 $hash = password_hash($password, PASSWORD_DEFAULT);
 
 $stmt = $conn->prepare(

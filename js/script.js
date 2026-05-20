@@ -49,6 +49,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /* =============================================
+       PASSWORD STRENGTH RULE
+       At least 12 chars, with uppercase, lowercase,
+       a number, and a special character.
+    ============================================= */
+    function validatePasswordStrength(pwd) {
+        if (pwd.length < 12) return "Password must be at least 12 characters long.";
+        if (!/[a-z]/.test(pwd)) return "Password must include a lowercase letter.";
+        if (!/[A-Z]/.test(pwd)) return "Password must include an uppercase letter.";
+        if (!/[0-9]/.test(pwd)) return "Password must include a number.";
+        if (!/[^A-Za-z0-9]/.test(pwd)) return "Password must include a special character.";
+        return "";
+    }
+
+    /* =============================================
        VALIDATION HELPERS (add/edit modals)
     ============================================= */
     function showError(inputEl, errorEl, msg) {
@@ -1043,8 +1057,9 @@ document.addEventListener("DOMContentLoaded", () => {
             showToast("error", "Missing Field", "Please enter your current password.");
             return;
         }
-        if (newPwd.length < 6) {
-            showToast("error", "Weak Password", "New password must be at least 6 characters.");
+        const pwdErr = validatePasswordStrength(newPwd);
+        if (pwdErr) {
+            showToast("error", "Weak Password", pwdErr);
             return;
         }
         if (newPwd !== confirmPwd) {

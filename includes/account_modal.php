@@ -61,7 +61,8 @@
                     <span class="material-icons form-icon">key</span>
                     New Password <span class="required-star">*</span>
                 </label>
-                <input type="password" id="newPassword" autocomplete="new-password" placeholder="At least 6 characters">
+                <input type="password" id="newPassword" autocomplete="new-password" placeholder="At least 12 characters">
+                <small style="font-size:12px;color:#94a3b8;margin-top:4px;">Must be 12+ characters with uppercase, lowercase, a number, and a special character.</small>
             </div>
             <div class="form-group full">
                 <label>

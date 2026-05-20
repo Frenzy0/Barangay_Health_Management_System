@@ -155,7 +155,3 @@ Clicking logout ends the session and brings the admin back to the login page.
 | Residents           | Admin only         | Add, edit, or remove residents         |
 | Health Notes        | Admin only         | View each resident's latest survey     |
 | Logout              | Admin only         | Sign out of the admin account          |
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
