@@ -159,7 +159,3 @@ Clicking logout ends the session and brings the admin back to the login page.
 "# Barangay_Health_Management_System" 
 "# Barangay_Health_Management_System" 
 "# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
-"# Barangay_Health_Management_System" 
