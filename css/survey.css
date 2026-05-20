@@ -1,0 +1,277 @@
+.survey-main {
+    flex: 1;
+    padding: 28px;
+    background: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.survey-page-header,
+#surveyForm {
+    width: 100%;
+    max-width: 850px;
+}
+
+/* FIX HEADER STICKING */
+.survey-page-header {
+    margin-bottom: 20px;
+}
+
+.survey-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+}
+
+.survey-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+/* Full Name + Suffix side-by-side row */
+.name-suffix-row {
+    display: grid;
+    grid-template-columns: 1fr 160px;
+    gap: 14px 16px;
+}
+
+/* Civil Status (left) + Age (right, narrow) row */
+.status-age-row {
+    display: grid;
+    grid-template-columns: 1fr 110px;
+    gap: 14px 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    box-sizing: border-box;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* RADIO BUTTON SAME HEIGHT AS INPUT */
+.radio-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    flex: 1;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    font-size: 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #0d9488;
+}
+
+/* CHECKBOX GROUP */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: background .15s, opacity .15s, border-color .15s;
+    user-select: none;
+}
+
+.checkbox-label:hover {
+    border-color: #0d9488;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: #0d9488;
+}
+
+/* Disabled when "None" is checked */
+.checkbox-label.disabled {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.checkbox-label.disabled:hover {
+    border-color: #e2e8f0;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+}
+
+/* BUTTONS */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #0d9488;
+    color: white;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+/* SUCCESS / ERROR ALERT */
+.survey-alert {
+    width: 100%;
+    max-width: 850px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.survey-alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.survey-alert-success a {
+    margin-left: auto;
+    color: #166534;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.survey-alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@media (max-width: 768px) {
+    .survey-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: 1;
+    }
+
+    .name-suffix-row {
+        grid-template-columns: 1fr;
+    }
+
+    .status-age-row {
+        grid-template-columns: 1fr;
+    }
+
+    .radio-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .radio-label {
+        flex: unset;
+        min-height: 44px;
+        padding: 0 10px;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .checkbox-label {
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .radio-group,
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+}
