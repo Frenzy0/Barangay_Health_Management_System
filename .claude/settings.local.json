@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/xampp/mysql/bin/**)",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root -e \"SELECT VERSION\\(\\);\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root bhms_db)",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root bhms_db -e \"SELECT id, first_name, middle_name, last_name, full_name FROM residents;\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root bhms_db -e \"SHOW COLUMNS FROM survey_responses;\")"
+    ]
+  }
+}

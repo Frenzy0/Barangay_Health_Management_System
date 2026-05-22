@@ -616,6 +616,14 @@ tbody tr:hover{
     gap:16px;
 }
 
+/* First / Middle / Last + Suffix row inside modals */
+.modal-grid .name-parts-row{
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 120px;
+    gap:16px;
+}
+
 .form-group label{
     display:flex;
     align-items:center;
@@ -1998,6 +2006,11 @@ body.public-page{
     }
 
     .modal-grid .name-suffix-row{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .modal-grid .name-parts-row{
         grid-template-columns:1fr;
         gap:12px;
     }

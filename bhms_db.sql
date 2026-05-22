@@ -106,6 +106,9 @@ INSERT INTO `admin_logs` (`id`, `admin_id`, `action`, `target`, `details`, `crea
 
 CREATE TABLE `residents` (
   `id` int(11) NOT NULL,
+  `first_name` varchar(50) NOT NULL DEFAULT '',
+  `middle_name` varchar(50) NOT NULL DEFAULT '',
+  `last_name` varchar(50) NOT NULL DEFAULT '',
   `full_name` varchar(100) NOT NULL,
   `suffix` varchar(10) DEFAULT NULL,
   `birthdate` date NOT NULL,
@@ -120,14 +123,14 @@ CREATE TABLE `residents` (
 -- Dumping data for table `residents`
 --
 
-INSERT INTO `residents` (`id`, `full_name`, `suffix`, `birthdate`, `age`, `civil_status`, `gender`, `purok`, `created_at`) VALUES
-(1, 'David Martinez', NULL, '1999-05-20', 26, 'Single', 'Male', 'Purok 4', '2026-05-15 04:52:18'),
-(2, 'Pearl Douglas', 'Sr', '1965-03-12', 61, 'Married', 'Female', 'Purok 3', '2026-05-15 05:03:48'),
-(3, 'Juan Dela Cruz', NULL, '2001-12-09', 24, 'Single', 'Male', 'Purok 1', '2026-05-15 05:16:12'),
-(4, 'Lucy Gomez Martinez', NULL, '2003-07-29', 22, 'Single', 'Female', 'Purok 3', '2026-05-15 05:19:29'),
-(5, 'John Lloyd Cruz', NULL, '1983-05-24', 42, 'Married', 'Male', 'Purok 2', '2026-05-15 05:25:19'),
-(6, 'Angela Lopez Mendoza', NULL, '1994-07-03', 31, 'Single', 'Female', 'Purok 5', '2026-05-15 05:29:23'),
-(7, 'Samantha Panelo Santos', NULL, '2002-06-29', 23, 'Single', 'Female', 'Purok 4', '2026-05-15 05:34:50');
+INSERT INTO `residents` (`id`, `first_name`, `middle_name`, `last_name`, `full_name`, `suffix`, `birthdate`, `age`, `civil_status`, `gender`, `purok`, `created_at`) VALUES
+(1, 'David', '', 'Martinez', 'David Martinez', NULL, '1999-05-20', 26, 'Single', 'Male', 'Purok 4', '2026-05-15 04:52:18'),
+(2, 'Pearl', '', 'Douglas', 'Pearl Douglas', 'Sr', '1965-03-12', 61, 'Married', 'Female', 'Purok 3', '2026-05-15 05:03:48'),
+(3, 'Juan', '', 'Dela Cruz', 'Juan Dela Cruz', NULL, '2001-12-09', 24, 'Single', 'Male', 'Purok 1', '2026-05-15 05:16:12'),
+(4, 'Lucy', 'Gomez', 'Martinez', 'Lucy Gomez Martinez', NULL, '2003-07-29', 22, 'Single', 'Female', 'Purok 3', '2026-05-15 05:19:29'),
+(5, 'John', 'Lloyd', 'Cruz', 'John Lloyd Cruz', NULL, '1983-05-24', 42, 'Married', 'Male', 'Purok 2', '2026-05-15 05:25:19'),
+(6, 'Angela', 'Lopez', 'Mendoza', 'Angela Lopez Mendoza', NULL, '1994-07-03', 31, 'Single', 'Female', 'Purok 5', '2026-05-15 05:29:23'),
+(7, 'Samantha', 'Panelo', 'Santos', 'Samantha Panelo Santos', NULL, '2002-06-29', 23, 'Single', 'Female', 'Purok 4', '2026-05-15 05:34:50');
 
 -- --------------------------------------------------------
 
@@ -146,6 +149,11 @@ CREATE TABLE `survey_responses` (
   `has_headache` tinyint(1) DEFAULT 0,
   `no_symptoms` tinyint(1) DEFAULT 0,
   `health_notes` text DEFAULT NULL,
+  `ec_first_name` varchar(50) DEFAULT NULL,
+  `ec_middle_name` varchar(50) DEFAULT NULL,
+  `ec_last_name` varchar(50) DEFAULT NULL,
+  `ec_contact_number` varchar(15) DEFAULT NULL,
+  `ec_relationship` varchar(30) DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -153,14 +161,14 @@ CREATE TABLE `survey_responses` (
 -- Dumping data for table `survey_responses`
 --
 
-INSERT INTO `survey_responses` (`id`, `resident_id`, `vaccination_status`, `last_checkup`, `has_fever`, `has_cough`, `has_fatigue`, `has_headache`, `no_symptoms`, `health_notes`, `submitted_at`) VALUES
-(1, 1, 'Vaccinated', '2026-05-03', 0, 0, 0, 0, 1, '', '2026-05-15 04:52:18'),
-(2, 2, 'Unvaccinated', '2026-03-20', 1, 1, 1, 1, 0, '', '2026-05-15 05:03:48'),
-(3, 3, 'Vaccinated', '2026-02-03', 0, 0, 0, 0, 1, '', '2026-05-15 05:16:12'),
-(4, 4, 'Vaccinated', '2025-12-03', 0, 0, 0, 0, 1, '', '2026-05-15 05:19:29'),
-(5, 5, 'Vaccinated', '2026-01-29', 1, 0, 0, 1, 0, 'Nagsusuka', '2026-05-15 05:25:19'),
-(6, 6, 'Unvaccinated', '2025-03-19', 0, 0, 0, 0, 1, '', '2026-05-15 05:29:23'),
-(7, 7, 'Unvaccinated', '2026-01-25', 0, 1, 1, 0, 0, 'di makahinga', '2026-05-15 05:34:50');
+INSERT INTO `survey_responses` (`id`, `resident_id`, `vaccination_status`, `last_checkup`, `has_fever`, `has_cough`, `has_fatigue`, `has_headache`, `no_symptoms`, `health_notes`, `ec_first_name`, `ec_middle_name`, `ec_last_name`, `ec_contact_number`, `ec_relationship`, `submitted_at`) VALUES
+(1, 1, 'Vaccinated', '2026-05-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 04:52:18'),
+(2, 2, 'Unvaccinated', '2026-03-20', 1, 1, 1, 1, 0, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:03:48'),
+(3, 3, 'Vaccinated', '2026-02-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:16:12'),
+(4, 4, 'Vaccinated', '2025-12-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:19:29'),
+(5, 5, 'Vaccinated', '2026-01-29', 1, 0, 0, 1, 0, 'Nagsusuka', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:25:19'),
+(6, 6, 'Unvaccinated', '2025-03-19', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:29:23'),
+(7, 7, 'Unvaccinated', '2026-01-25', 0, 1, 1, 0, 0, 'di makahinga', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:34:50');
 
 --
 -- Indexes for dumped tables

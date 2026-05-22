@@ -45,14 +45,22 @@
 
             <div class="survey-grid">
 
-                <div class="full name-suffix-row">
-                    <div class="form-group name-field">
-                        <label>Full Name <span class="required-star">*</span></label>
-                        <input type="text" name="full_name" placeholder="Juan Dela Cruz">
+                <div class="full name-parts-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required-star">*</span></label>
+                        <input type="text" name="first_name" placeholder="Juan">
                     </div>
-                    <div class="form-group suffix-field">
+                    <div class="form-group">
+                        <label>Middle Name <span class="required-star">*</span></label>
+                        <input type="text" name="middle_name" placeholder="Santos">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required-star">*</span></label>
+                        <input type="text" name="last_name" placeholder="Dela Cruz">
+                    </div>
+                    <div class="form-group">
                         <label>Suffix</label>
-                        <input type="text" name="suffix" placeholder="e.g. Jr., Sr., III" maxlength="10">
+                        <input type="text" name="suffix" placeholder="e.g. Jr." maxlength="10">
                     </div>
                 </div>
 
@@ -142,6 +150,57 @@
                 <div class="form-group full">
                     <label>Additional Health Notes</label>
                     <textarea name="health_notes" placeholder="Additional notes..."></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EMERGENCY CONTACT -->
+        <div class="survey-card">
+            <h3 class="section-title">
+                <span class="material-icons-outlined">contact_emergency</span>
+                Emergency Contact
+            </h3>
+
+            <div class="survey-grid">
+
+                <div class="form-group full">
+                    <label>Contact Person Details</label>
+                    <div class="name-triple-row">
+                        <div class="form-group">
+                            <label>First Name <span class="required-star">*</span></label>
+                            <input type="text" name="ec_first_name" placeholder="Juan">
+                        </div>
+                        <div class="form-group">
+                            <label>Middle Name <span class="required-star">*</span></label>
+                            <input type="text" name="ec_middle_name" placeholder="Santos">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required-star">*</span></label>
+                            <input type="text" name="ec_last_name" placeholder="Dela Cruz">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Number <span class="required-star">*</span></label>
+                    <input type="tel" name="ec_contact_number" placeholder="09171234567" maxlength="11">
+                </div>
+
+                <div class="form-group">
+                    <label>Relationship to Contact Person <span class="required-star">*</span></label>
+                    <select name="ec_relationship">
+                        <option value="">Select Relationship</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Child">Child</option>
+                        <option value="Grandparent">Grandparent</option>
+                        <option value="Relative">Relative</option>
+                        <option value="Guardian">Guardian</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
 
             </div>

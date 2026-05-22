@@ -4,19 +4,28 @@ header('Content-Type: application/json');
 require '../db.php';
 require '../helpers/log.php';
 
-$name   = trim($_POST['full_name']    ?? '');
-$suffix = trim($_POST['suffix']       ?? '');
-$bd     = $_POST['birthdate']         ?? '';
-$age    = (int)($_POST['age']         ?? 0);
-$status = $_POST['civil_status']      ?? '';
-$gender = $_POST['gender']            ?? '';
-$purok  = $_POST['purok']             ?? '';
+$first  = trim($_POST['first_name']  ?? '');
+$middle = trim($_POST['middle_name'] ?? '');
+$last   = trim($_POST['last_name']   ?? '');
+$suffix = trim($_POST['suffix']      ?? '');
+$bd     = $_POST['birthdate']        ?? '';
+$age    = (int)($_POST['age']        ?? 0);
+$status = $_POST['civil_status']     ?? '';
+$gender = $_POST['gender']           ?? '';
+$purok  = $_POST['purok']            ?? '';
 
 $ok_status = ['Single','Married','Widowed','Separated'];
 $ok_gender = ['Male','Female','Other'];
 $ok_purok  = ['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'];
+$name_re   = '/^[A-Za-z\s.\-\']+$/';
 
-if (!$name || !$bd || $age < 1 || $age > 120
+foreach (['First name' => $first, 'Middle name' => $middle, 'Last name' => $last] as $label => $val) {
+    if ($val === '' || !preg_match($name_re, $val)) {
+        echo json_encode(['success' => false, 'error' => "$label is required and may only contain letters, spaces, dots, hyphens, and apostrophes."]);
+        exit;
+    }
+}
+if (!$bd || $age < 1 || $age > 120
     || !in_array($status, $ok_status)
     || !in_array($gender, $ok_gender)
     || !in_array($purok,  $ok_purok)) {
@@ -28,15 +37,16 @@ if ($suffix !== '' && !preg_match('/^[A-Za-z.\s]{1,10}$/', $suffix)) {
     exit;
 }
 $suffix_db = $suffix !== '' ? $suffix : null;
+$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle $last"));
 
 $stmt = $conn->prepare(
-    "INSERT INTO residents (full_name, suffix, birthdate, age, civil_status, gender, purok)
-     VALUES (?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO residents (first_name, middle_name, last_name, full_name, suffix, birthdate, age, civil_status, gender, purok)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
-$stmt->bind_param('sssisss', $name, $suffix_db, $bd, $age, $status, $gender, $purok);
+$stmt->bind_param('ssssssisss', $first, $middle, $last, $full_name, $suffix_db, $bd, $age, $status, $gender, $purok);
 
 if ($stmt->execute()) {
-    $logName = $suffix_db ? "$name $suffix_db" : $name;
+    $logName = $suffix_db ? "$full_name $suffix_db" : $full_name;
     logAction($conn, 'Added resident', $logName);
     echo json_encode(['success' => true, 'id' => $conn->insert_id]);
 } else {

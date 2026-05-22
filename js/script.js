@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function clearAllErrors(prefix) {
-        ["Name", "Suffix", "Birthdate", "Age", "Status", "Gender", "Purok"].forEach(f => {
+        ["FirstName", "MiddleName", "LastName", "Suffix", "Birthdate", "Age", "Status", "Gender", "Purok"].forEach(f => {
             const input = document.getElementById(prefix + f);
             const error = document.getElementById(prefix + f + "Error");
             if (input && error) clearError(input, error);
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function attachLiveValidation(prefix) {
-        ["Name", "Suffix", "Birthdate", "Age", "Status", "Gender", "Purok"].forEach(f => {
+        ["FirstName", "MiddleName", "LastName", "Suffix", "Birthdate", "Age", "Status", "Gender", "Purok"].forEach(f => {
             const input = document.getElementById(prefix + f);
             const error = document.getElementById(prefix + f + "Error");
             if (!input || !error) return;
@@ -134,30 +134,30 @@ document.addEventListener("DOMContentLoaded", () => {
         let valid = true;
         const get = id => document.getElementById(id);
 
-        const nameEl = get(prefix + "Name");
-        const nameErr = get(prefix + "NameError");
-        const nameVal = nameEl.value.trim();
-        if (!nameVal) {
-            showError(nameEl, nameErr, "Full name is required.");
-            showToast("error", "Invalid Name", "Full name is required.");
-            valid = false;
-        } else if (nameVal.length < 5) {
-            showError(nameEl, nameErr, "Full name must be at least 5 characters.");
-            showToast("error", "Invalid Name", "Full name must be at least 5 characters.");
-            valid = false;
-        } else if (/\d/.test(nameVal)) {
-            showError(nameEl, nameErr, "Name must not contain numbers.");
-            showToast("error", "Invalid Name", "Full name must not contain numbers.");
-            valid = false;
-        } else if (!/^[A-Za-zÀ-ÿ\s.\-']+$/.test(nameVal)) {
-            showError(nameEl, nameErr, "Name may only contain letters, spaces, dots, hyphens, apostrophes.");
-            showToast("error", "Invalid Name", "Full name may only contain letters, spaces, dots, hyphens, apostrophes.");
-            valid = false;
-        } else {
-            const titled = toTitleCase(nameVal);
-            nameEl.value = titled;
-            clearError(nameEl, nameErr);
-        }
+        // First / Middle / Last name — each required, letters-only.
+        [["FirstName", "First name"], ["MiddleName", "Middle name"], ["LastName", "Last name"]]
+        .forEach(([idSuffix, label]) => {
+            const el  = get(prefix + idSuffix);
+            const err = get(prefix + idSuffix + "Error");
+            if (!el) return;
+            const val = el.value.trim();
+            if (!val) {
+                showError(el, err, label + " is required.");
+                showToast("error", "Invalid Name", label + " is required.");
+                valid = false;
+            } else if (/\d/.test(val)) {
+                showError(el, err, label + " must not contain numbers.");
+                showToast("error", "Invalid Name", label + " must not contain numbers.");
+                valid = false;
+            } else if (!/^[A-Za-zÀ-ÿ\s.\-']+$/.test(val)) {
+                showError(el, err, label + " may only contain letters, spaces, dots, hyphens, apostrophes.");
+                showToast("error", "Invalid Name", label + " may only contain letters, spaces, dots, hyphens, apostrophes.");
+                valid = false;
+            } else {
+                el.value = toTitleCase(val);
+                clearError(el, err);
+            }
+        });
 
         const sxEl = get(prefix + "Suffix");
         const sxErr = get(prefix + "SuffixError");
@@ -436,7 +436,9 @@ document.addEventListener("DOMContentLoaded", () => {
         currentEditRow = btn.closest("tr");
         const cells = currentEditRow.querySelectorAll("td");
 
-        document.getElementById("editName").value = currentEditRow.dataset.fullname || "";
+        document.getElementById("editFirstName").value = currentEditRow.dataset.firstname || "";
+        document.getElementById("editMiddleName").value = currentEditRow.dataset.middlename || "";
+        document.getElementById("editLastName").value = currentEditRow.dataset.lastname || "";
         document.getElementById("editSuffix").value = currentEditRow.dataset.suffix || "";
         document.getElementById("editBirthdate").value = cells[1].textContent.trim();
         document.getElementById("editAge").value = cells[2].textContent.trim();
@@ -451,13 +453,18 @@ document.addEventListener("DOMContentLoaded", () => {
     saveChangesBtn?.addEventListener("click", () => {
         if (!validateForm("edit") || !currentEditRow) return;
 
-        const fullName = document.getElementById("editName").value.trim();
+        const first    = document.getElementById("editFirstName").value.trim();
+        const middle   = document.getElementById("editMiddleName").value.trim();
+        const last     = document.getElementById("editLastName").value.trim();
         const suffix   = document.getElementById("editSuffix").value.trim();
+        const fullName = [first, middle, last].filter(Boolean).join(" ");
         const display  = suffix ? `${fullName} ${suffix}` : fullName;
 
         const fd = new FormData();
         fd.append("id", currentEditRow.dataset.id);
-        fd.append("full_name", fullName);
+        fd.append("first_name", first);
+        fd.append("middle_name", middle);
+        fd.append("last_name", last);
         fd.append("suffix", suffix);
         fd.append("birthdate", document.getElementById("editBirthdate").value.trim());
         fd.append("age", document.getElementById("editAge").value.trim());
@@ -481,6 +488,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 cells[4].textContent = fd.get("gender");
                 cells[5].textContent = fd.get("purok");
                 currentEditRow.dataset.fullname = fullName;
+                currentEditRow.dataset.firstname = first;
+                currentEditRow.dataset.middlename = middle;
+                currentEditRow.dataset.lastname = last;
                 currentEditRow.dataset.suffix = suffix;
                 closeModal(editModal);
                 showToast("success", "Changes Saved", `${display}'s information has been updated.`);
@@ -513,12 +523,17 @@ document.addEventListener("DOMContentLoaded", () => {
     confirmAddBtn?.addEventListener("click", () => {
         if (!validateForm("add")) return;
 
-        const fullName = document.getElementById("addName").value.trim();
+        const first    = document.getElementById("addFirstName").value.trim();
+        const middle   = document.getElementById("addMiddleName").value.trim();
+        const last     = document.getElementById("addLastName").value.trim();
         const suffix   = document.getElementById("addSuffix").value.trim();
+        const fullName = [first, middle, last].filter(Boolean).join(" ");
         const display  = suffix ? `${fullName} ${suffix}` : fullName;
 
         const fd = new FormData();
-        fd.append("full_name", fullName);
+        fd.append("first_name", first);
+        fd.append("middle_name", middle);
+        fd.append("last_name", last);
         fd.append("suffix", suffix);
         fd.append("birthdate", document.getElementById("addBirthdate").value.trim());
         fd.append("age", document.getElementById("addAge").value.trim());
@@ -541,6 +556,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const newRow = document.createElement("tr");
                 newRow.dataset.id = data.id;
                 newRow.dataset.fullname = fullName;
+                newRow.dataset.firstname = first;
+                newRow.dataset.middlename = middle;
+                newRow.dataset.lastname = last;
                 newRow.dataset.suffix = suffix;
                 newRow.innerHTML = `
                     <td data-label="Name">${escapeHtml(display)}</td>
@@ -695,7 +713,6 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
 
             const fd = new FormData(surveyForm);
-            const nameRaw = (fd.get("full_name") || "").trim();
             const suffix = (fd.get("suffix") || "").trim();
             const birthdate = (fd.get("birthdate") || "").trim();
             const age = (fd.get("age") || "").trim();
@@ -709,24 +726,29 @@ document.addEventListener("DOMContentLoaded", () => {
             const today = new Date();
             today.setHours(23, 59, 59, 999); // end of today, allow today's date
 
-            if (!nameRaw) {
-                showToast("error", "Missing Field", "Please enter the full name.");
-                return;
+            // Resident name — First / Middle / Last, each required and letters-only.
+            const nameRe = /^[A-Za-zÀ-ÿ\s.\-']+$/;
+            const nameChecks = [
+                ["First Name",  "first_name"],
+                ["Middle Name", "middle_name"],
+                ["Last Name",   "last_name"],
+            ];
+            for (const [label, field] of nameChecks) {
+                const value = (fd.get(field) || "").trim();
+                if (!value) {
+                    showToast("error", "Missing Field", `Please enter the ${label.toLowerCase()}.`);
+                    return;
+                }
+                if (!nameRe.test(value)) {
+                    showToast("error", `Invalid ${label}`, `${label} may only contain letters, spaces, dots, hyphens, and apostrophes.`);
+                    return;
+                }
+                // Auto-capitalize, then write back to the field & FormData.
+                const titled = toTitleCase(value);
+                const el = surveyForm.querySelector(`[name="${field}"]`);
+                if (el) el.value = titled;
+                fd.set(field, titled);
             }
-            if (nameRaw.length < 5) {
-                showToast("error", "Invalid Name", "Full name must be at least 5 characters.");
-                return;
-            }
-            // Strict: only letters, spaces, dots, hyphens, apostrophes (rejects "444444", "@#$", etc.)
-            if (!/^[A-Za-zÀ-ÿ\s.\-']+$/.test(nameRaw)) {
-                showToast("error", "Invalid Name", "Full name may only contain letters, spaces, dots, hyphens, and apostrophes.");
-                return;
-            }
-            // Auto-capitalize the first letter of each word, then update the form field & FormData.
-            const name = toTitleCase(nameRaw);
-            const nameInput = surveyForm.querySelector('[name="full_name"]');
-            if (nameInput) nameInput.value = name;
-            fd.set("full_name", name);
             if (suffix && !/^[A-Za-z.\s]{1,10}$/.test(suffix)) {
                 showToast("error", "Invalid Suffix", "Suffix may only contain letters, dots, and spaces (e.g. Jr., Sr., III).");
                 return;
@@ -790,6 +812,47 @@ document.addEventListener("DOMContentLoaded", () => {
             const symptomsChecked = surveyForm.querySelectorAll('input[name="symptoms[]"]:checked');
             if (symptomsChecked.length === 0) {
                 showToast("error", "Missing Field", "Please answer the recent symptoms (select at least one, or 'None').");
+                return;
+            }
+
+            /* ---- Emergency Contact validation ---- */
+            const ecFirst   = (fd.get("ec_first_name")     || "").trim();
+            const ecMiddle  = (fd.get("ec_middle_name")    || "").trim();
+            const ecLast    = (fd.get("ec_last_name")      || "").trim();
+            const ecNumber  = (fd.get("ec_contact_number") || "").trim();
+            const ecRel     = fd.get("ec_relationship")    || "";
+
+            const ecNameChecks = [
+                ["First Name",  ecFirst,  "ec_first_name"],
+                ["Middle Name", ecMiddle, "ec_middle_name"],
+                ["Last Name",   ecLast,   "ec_last_name"],
+            ];
+            for (const [label, value, field] of ecNameChecks) {
+                if (!value) {
+                    showToast("error", "Missing Field", `Please enter the contact person's ${label.toLowerCase()}.`);
+                    return;
+                }
+                if (!nameRe.test(value)) {
+                    showToast("error", `Invalid ${label}`, `${label} may only contain letters, spaces, dots, hyphens, and apostrophes.`);
+                    return;
+                }
+                // Auto-capitalize and write back to the field & FormData.
+                const titled = toTitleCase(value);
+                const el = surveyForm.querySelector(`[name="${field}"]`);
+                if (el) el.value = titled;
+                fd.set(field, titled);
+            }
+
+            if (!ecNumber) {
+                showToast("error", "Missing Field", "Please enter the contact person's contact number.");
+                return;
+            }
+            if (!/^09\d{9}$/.test(ecNumber)) {
+                showToast("error", "Invalid Contact Number", "Contact number must be 11 digits and start with 09 (e.g. 09171234567).");
+                return;
+            }
+            if (!ecRel) {
+                showToast("error", "Missing Field", "Please select the relationship to the contact person.");
                 return;
             }
 

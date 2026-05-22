@@ -3,7 +3,7 @@ require 'auth.php';
 require 'db.php';
 
 $res = $conn->query("
-    SELECT id, full_name, suffix, birthdate, age, civil_status, gender, purok
+    SELECT id, first_name, middle_name, last_name, full_name, suffix, birthdate, age, civil_status, gender, purok
     FROM residents
     ORDER BY full_name ASC
 ");
@@ -156,6 +156,9 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
                 ?>
                     <tr data-id="<?= $r['id'] ?>"
                         data-fullname="<?= htmlspecialchars($r['full_name'], ENT_QUOTES) ?>"
+                        data-firstname="<?= htmlspecialchars($r['first_name'] ?? '', ENT_QUOTES) ?>"
+                        data-middlename="<?= htmlspecialchars($r['middle_name'] ?? '', ENT_QUOTES) ?>"
+                        data-lastname="<?= htmlspecialchars($r['last_name'] ?? '', ENT_QUOTES) ?>"
                         data-suffix="<?= htmlspecialchars($suffix, ENT_QUOTES) ?>">
                         <td data-label="Name"><?= htmlspecialchars($display) ?></td>
                         <td data-label="Birthdate"><?= htmlspecialchars($r['birthdate'] ?? '') ?></td>
@@ -211,21 +214,37 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <div class="modal-grid">
-                <div class="full name-suffix-row">
-                    <div class="form-group name-field">
+                <div class="full name-parts-row">
+                    <div class="form-group">
                         <label>
                             <span class="material-icons form-icon">person</span>
-                            Full Name <span class="required-star">*</span>
+                            First Name <span class="required-star">*</span>
                         </label>
-                        <input type="text" id="editName" placeholder="e.g. Juan Dela Cruz">
-                        <span class="field-error" id="editNameError"></span>
+                        <input type="text" id="editFirstName" placeholder="e.g. Juan">
+                        <span class="field-error" id="editFirstNameError"></span>
                     </div>
-                    <div class="form-group suffix-field">
+                    <div class="form-group">
+                        <label>
+                            <span class="material-icons form-icon">person</span>
+                            Middle Name <span class="required-star">*</span>
+                        </label>
+                        <input type="text" id="editMiddleName" placeholder="e.g. Santos">
+                        <span class="field-error" id="editMiddleNameError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <span class="material-icons form-icon">person</span>
+                            Last Name <span class="required-star">*</span>
+                        </label>
+                        <input type="text" id="editLastName" placeholder="e.g. Dela Cruz">
+                        <span class="field-error" id="editLastNameError"></span>
+                    </div>
+                    <div class="form-group">
                         <label>
                             <span class="material-icons form-icon">badge</span>
                             Suffix
                         </label>
-                        <input type="text" id="editSuffix" placeholder="e.g. Jr., Sr., III" maxlength="10">
+                        <input type="text" id="editSuffix" placeholder="e.g. Jr." maxlength="10">
                         <span class="field-error" id="editSuffixError"></span>
                     </div>
                 </div>
@@ -322,15 +341,25 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <div class="modal-grid">
-                <div class="full name-suffix-row">
-                    <div class="form-group name-field">
-                        <label>Full Name <span class="required-star">*</span></label>
-                        <input type="text" id="addName" placeholder="e.g. Juan Dela Cruz">
-                        <span class="field-error" id="addNameError"></span>
+                <div class="full name-parts-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required-star">*</span></label>
+                        <input type="text" id="addFirstName" placeholder="e.g. Juan">
+                        <span class="field-error" id="addFirstNameError"></span>
                     </div>
-                    <div class="form-group suffix-field">
+                    <div class="form-group">
+                        <label>Middle Name <span class="required-star">*</span></label>
+                        <input type="text" id="addMiddleName" placeholder="e.g. Santos">
+                        <span class="field-error" id="addMiddleNameError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required-star">*</span></label>
+                        <input type="text" id="addLastName" placeholder="e.g. Dela Cruz">
+                        <span class="field-error" id="addLastNameError"></span>
+                    </div>
+                    <div class="form-group">
                         <label>Suffix</label>
-                        <input type="text" id="addSuffix" placeholder="e.g. Jr., Sr., III" maxlength="10">
+                        <input type="text" id="addSuffix" placeholder="e.g. Jr." maxlength="10">
                         <span class="field-error" id="addSuffixError"></span>
                     </div>
                 </div>

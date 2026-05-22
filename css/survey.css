@@ -63,6 +63,20 @@
     gap: 14px 16px;
 }
 
+/* First / Middle / Last name row */
+.name-triple-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px 16px;
+}
+
+/* First / Middle / Last + Suffix row */
+.name-parts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 110px;
+    gap: 14px 16px;
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -241,6 +255,14 @@ textarea {
     }
 
     .status-age-row {
+        grid-template-columns: 1fr;
+    }
+
+    .name-triple-row {
+        grid-template-columns: 1fr;
+    }
+
+    .name-parts-row {
         grid-template-columns: 1fr;
     }
 
