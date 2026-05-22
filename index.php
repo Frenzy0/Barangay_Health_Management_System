@@ -198,8 +198,6 @@
                         <option value="Grandparent">Grandparent</option>
                         <option value="Relative">Relative</option>
                         <option value="Guardian">Guardian</option>
-                        <option value="Friend">Friend</option>
-                        <option value="Other">Other</option>
                     </select>
                 </div>
 

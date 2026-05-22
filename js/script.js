@@ -375,6 +375,70 @@ document.addEventListener("DOMContentLoaded", () => {
     })();
 
     /* =============================================
+       CONTACT DETAIL PANEL (Health Notes)
+    ============================================= */
+    (() => {
+        const panel    = document.getElementById('contactPanel');
+        const backdrop = document.getElementById('detailBackdrop');
+        const grid     = document.getElementById('notesGrid');
+        if (!panel || !backdrop || !grid) return;
+
+        const closeBtn = document.getElementById('closeContactPanel');
+
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = (val && val.trim()) ? val.trim() : '—';
+        };
+
+        function openPanel(card) {
+            setText('dpResidentName', card.dataset.fullname);
+            setText('dpResidentMeta',
+                [card.dataset.purok, card.dataset.gender].filter(Boolean).join(' · '));
+            setText('dpEcName', card.dataset.ecName);
+            setText('dpEcRel',  card.dataset.ecRel);
+
+            const numEl = document.getElementById('dpEcNumber');
+            const num   = (card.dataset.ecNumber || '').trim();
+            if (numEl) {
+                numEl.textContent = num || '—';
+                if (num) numEl.setAttribute('href', 'tel:' + num);
+                else     numEl.removeAttribute('href');
+            }
+
+            panel.classList.add('show');
+            panel.setAttribute('aria-hidden', 'false');
+            backdrop.classList.add('show');
+        }
+
+        function closePanel() {
+            panel.classList.remove('show');
+            panel.setAttribute('aria-hidden', 'true');
+            backdrop.classList.remove('show');
+        }
+
+        grid.addEventListener('click', e => {
+            if (e.target.closest('textarea')) return;
+            const card = e.target.closest('.note-card');
+            if (card) openPanel(card);
+        });
+
+        grid.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const card = e.target.closest('.note-card');
+            if (card && e.target === card) {
+                e.preventDefault();
+                openPanel(card);
+            }
+        });
+
+        closeBtn?.addEventListener('click', closePanel);
+        backdrop.addEventListener('click', closePanel);
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && panel.classList.contains('show')) closePanel();
+        });
+    })();
+
+    /* =============================================
        RESIDENT SEARCH (by surname only)
     ============================================= */
     function extractSurname(fullName) {

@@ -6,7 +6,9 @@ $res = $conn->query("
     SELECT r.id, r.full_name, r.suffix, r.gender, r.purok,
            sr.vaccination_status,
            sr.has_fever, sr.has_cough, sr.has_fatigue, sr.has_headache, sr.no_symptoms,
-           sr.last_checkup, sr.health_notes, sr.submitted_at
+           sr.last_checkup, sr.health_notes, sr.submitted_at,
+           sr.ec_first_name, sr.ec_middle_name, sr.ec_last_name,
+           sr.ec_contact_number, sr.ec_relationship
     FROM residents r
     INNER JOIN survey_responses sr ON sr.id = (
         SELECT id FROM survey_responses
@@ -143,13 +145,29 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
                 $row_suffix  = trim($row['suffix'] ?? '');
                 $row_display = $row_suffix !== '' ? $row['full_name'] . ' ' . $row_suffix : $row['full_name'];
 
+                // Emergency contact (from the latest survey response)
+                $ec_name = trim(implode(' ', array_filter([
+                    trim((string)($row['ec_first_name']  ?? '')),
+                    trim((string)($row['ec_middle_name'] ?? '')),
+                    trim((string)($row['ec_last_name']   ?? '')),
+                ])));
+                $ec_rel    = trim((string)($row['ec_relationship']   ?? ''));
+                $ec_number = trim((string)($row['ec_contact_number'] ?? ''));
+
                 $sym_list = [];
                 if ($row['has_fever'])    $sym_list[] = ['fever',    'Fever',    'thermostat'];
                 if ($row['has_cough'])    $sym_list[] = ['cough',    'Cough',    'sick'];
                 if ($row['has_fatigue'])  $sym_list[] = ['fatigue',  'Fatigue',  'bedtime'];
                 if ($row['has_headache']) $sym_list[] = ['headache', 'Headache', 'psychology_alt'];
             ?>
-            <div class="note-card" data-name="<?= htmlspecialchars(strtolower($row_display)) ?>">
+            <div class="note-card" tabindex="0" role="button"
+                 data-name="<?= htmlspecialchars(strtolower($row_display)) ?>"
+                 data-fullname="<?= htmlspecialchars($row_display, ENT_QUOTES) ?>"
+                 data-purok="<?= htmlspecialchars($row['purok'] ?? '', ENT_QUOTES) ?>"
+                 data-gender="<?= htmlspecialchars($row['gender'] ?? '', ENT_QUOTES) ?>"
+                 data-ec-name="<?= htmlspecialchars($ec_name, ENT_QUOTES) ?>"
+                 data-ec-rel="<?= htmlspecialchars($ec_rel, ENT_QUOTES) ?>"
+                 data-ec-number="<?= htmlspecialchars($ec_number, ENT_QUOTES) ?>">
                 <div class="note-card-top">
                     <div class="note-avatar"><span class="material-icons">person</span></div>
                     <div class="note-identity">
@@ -198,7 +216,10 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
                     <textarea readonly placeholder="No additional notes provided."><?= htmlspecialchars($notes) ?></textarea>
                 </div>
 
-                
+                <div class="note-card-foot">
+                    <span class="material-icons">contact_phone</span>
+                    View contact information
+                </div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -219,7 +240,54 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
 
     </div>
 
-    
+    <!-- ===== CONTACT DETAIL PANEL ===== -->
+    <div class="detail-backdrop" id="detailBackdrop"></div>
+    <aside class="detail-panel" id="contactPanel" aria-hidden="true" aria-label="Resident contact information">
+        <div class="detail-panel-header">
+            <span class="material-icons">contact_phone</span>
+            <h3>Contact Information</h3>
+            <button class="detail-panel-close" id="closeContactPanel" type="button" aria-label="Close">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+
+        <div class="detail-panel-body">
+            <div class="detail-card">
+                <div class="detail-card-head">
+                    <div class="note-avatar"><span class="material-icons">person</span></div>
+                    <div>
+                        <h4 id="dpResidentName">—</h4>
+                        <p id="dpResidentMeta">—</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <span class="detail-card-label">Emergency Contact</span>
+                <div class="detail-row">
+                    <span class="material-icons">badge</span>
+                    <div>
+                        <span class="detail-row-label">Contact Person</span>
+                        <span class="detail-row-value" id="dpEcName">—</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="material-icons">diversity_1</span>
+                    <div>
+                        <span class="detail-row-label">Relationship</span>
+                        <span class="detail-row-value" id="dpEcRel">—</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="material-icons">call</span>
+                    <div>
+                        <span class="detail-row-label">Contact Number</span>
+                        <a class="detail-row-value" id="dpEcNumber">—</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <?php include 'includes/account_modal.php'; ?>
 

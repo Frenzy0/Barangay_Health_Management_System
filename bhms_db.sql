@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2026 at 03:25 AM
+-- Generation Time: May 22, 2026 at 07:19 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -96,7 +96,19 @@ INSERT INTO `admin_logs` (`id`, `admin_id`, `action`, `target`, `details`, `crea
 (33, 2, 'Deleted resident', 'Abdul Jakul Salsalagi', NULL, '2026-05-21 04:28:35'),
 (34, 2, 'Logged in', NULL, NULL, '2026-05-21 04:42:24'),
 (35, 2, 'Logged in', NULL, NULL, '2026-05-22 01:23:26'),
-(36, 2, 'Deleted resident', 'Mark Joshua Apor', NULL, '2026-05-22 01:23:36');
+(36, 2, 'Deleted resident', 'Mark Joshua Apor', NULL, '2026-05-22 01:23:36'),
+(37, 2, 'Logged in', NULL, NULL, '2026-05-22 04:22:19'),
+(38, 2, 'Logged in', NULL, NULL, '2026-05-22 04:25:11'),
+(39, 2, 'Logged in', NULL, NULL, '2026-05-22 04:32:14'),
+(40, 2, 'Deleted resident', 'Frenz Louis Canonigo Bautista', NULL, '2026-05-22 04:44:45'),
+(41, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-22 04:47:04'),
+(42, 2, 'Logged in', NULL, NULL, '2026-05-22 05:02:32'),
+(43, 2, 'Logged in', NULL, NULL, '2026-05-22 05:04:51'),
+(44, 2, 'Logged in', NULL, NULL, '2026-05-22 05:11:51'),
+(45, 2, 'Edited resident', 'David Barry Martinez', NULL, '2026-05-22 05:13:09'),
+(46, 2, 'Edited resident', 'Lucy Gomez Martinez', NULL, '2026-05-22 05:13:16'),
+(47, 2, 'Edited resident', 'Pearl Lumen Douglas Sr', NULL, '2026-05-22 05:13:20'),
+(48, 2, 'Edited resident', 'Samantha Panelo Santos', NULL, '2026-05-22 05:13:22');
 
 -- --------------------------------------------------------
 
@@ -124,8 +136,8 @@ CREATE TABLE `residents` (
 --
 
 INSERT INTO `residents` (`id`, `first_name`, `middle_name`, `last_name`, `full_name`, `suffix`, `birthdate`, `age`, `civil_status`, `gender`, `purok`, `created_at`) VALUES
-(1, 'David', '', 'Martinez', 'David Martinez', NULL, '1999-05-20', 26, 'Single', 'Male', 'Purok 4', '2026-05-15 04:52:18'),
-(2, 'Pearl', '', 'Douglas', 'Pearl Douglas', 'Sr', '1965-03-12', 61, 'Married', 'Female', 'Purok 3', '2026-05-15 05:03:48'),
+(1, 'David', 'Barry', 'Martinez', 'David Barry Martinez', NULL, '1999-05-20', 26, 'Single', 'Male', 'Purok 4', '2026-05-15 04:52:18'),
+(2, 'Pearl', 'Lumen', 'Douglas', 'Pearl Lumen Douglas', 'Sr', '1965-03-12', 61, 'Married', 'Female', 'Purok 3', '2026-05-15 05:03:48'),
 (3, 'Juan', '', 'Dela Cruz', 'Juan Dela Cruz', NULL, '2001-12-09', 24, 'Single', 'Male', 'Purok 1', '2026-05-15 05:16:12'),
 (4, 'Lucy', 'Gomez', 'Martinez', 'Lucy Gomez Martinez', NULL, '2003-07-29', 22, 'Single', 'Female', 'Purok 3', '2026-05-15 05:19:29'),
 (5, 'John', 'Lloyd', 'Cruz', 'John Lloyd Cruz', NULL, '1983-05-24', 42, 'Married', 'Male', 'Purok 2', '2026-05-15 05:25:19'),
@@ -153,7 +165,7 @@ CREATE TABLE `survey_responses` (
   `ec_middle_name` varchar(50) DEFAULT NULL,
   `ec_last_name` varchar(50) DEFAULT NULL,
   `ec_contact_number` varchar(15) DEFAULT NULL,
-  `ec_relationship` varchar(30) DEFAULT NULL,
+  `ec_relationship` enum('Parent','Spouse','Sibling','Child','Grandparent','Relative','Guardian') DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -215,19 +227,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables

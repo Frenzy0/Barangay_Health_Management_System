@@ -616,12 +616,20 @@ tbody tr:hover{
     gap:16px;
 }
 
-/* First / Middle / Last + Suffix row inside modals */
+/* First / Middle / Last / Suffix in one row — matches the survey form
+   layout (3 equal name columns + a narrower Suffix column). */
 .modal-grid .name-parts-row{
     grid-column:1/-1;
     display:grid;
-    grid-template-columns:1fr 1fr 1fr 120px;
+    grid-template-columns:1fr 1fr 1fr 110px;
     gap:16px;
+}
+
+/* Allow the columns to shrink to the modal width (inputs have an
+   intrinsic min-width that would otherwise force a horizontal scroll). */
+.modal-grid .name-parts-row .form-group,
+.modal-grid .name-parts-row .form-group input{
+    min-width:0;
 }
 
 .form-group label{
@@ -1334,6 +1342,205 @@ body.public-page{
 .note-section textarea:focus{
     outline:none;
     border-color:#0d9488;
+}
+
+/* Clickable note cards open the contact detail panel */
+.note-card{
+    cursor:pointer;
+    transition:box-shadow .2s, transform .2s;
+}
+
+.note-card:hover{
+    box-shadow:0 8px 22px rgba(15,23,42,.12);
+    transform:translateY(-2px);
+}
+
+.note-card:focus-visible{
+    outline:2px solid #0d9488;
+    outline-offset:2px;
+}
+
+.note-card-foot{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:auto;
+    padding-top:12px;
+    border-top:1px solid #f1f5f9;
+    font-size:12px;
+    font-weight:700;
+    color:#0d9488;
+}
+
+.note-card-foot .material-icons{
+    font-size:16px;
+}
+
+/* ================= CONTACT DETAIL PANEL ================= */
+.detail-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.45);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .25s, visibility .25s;
+    z-index:1400;
+}
+
+.detail-backdrop.show{
+    opacity:1;
+    visibility:visible;
+}
+
+.detail-panel{
+    position:fixed;
+    top:0;
+    right:0;
+    bottom:0;
+    width:390px;
+    max-width:92vw;
+    background:#f1f5f9;
+    box-shadow:-10px 0 36px rgba(15,23,42,.22);
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    z-index:1450;
+    display:flex;
+    flex-direction:column;
+}
+
+.detail-panel.show{
+    transform:translateX(0);
+}
+
+.detail-panel-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:20px 22px;
+    background:#fff;
+    border-bottom:1px solid #e2e8f0;
+    flex-shrink:0;
+}
+
+.detail-panel-header > .material-icons{
+    color:#0d9488;
+}
+
+.detail-panel-header h3{
+    margin:0;
+    font-size:16px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.detail-panel-close{
+    margin-left:auto;
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:8px;
+    background:#f1f5f9;
+    color:#64748b;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
+
+.detail-panel-close:hover{
+    background:#e2e8f0;
+    color:#0f172a;
+}
+
+.detail-panel-body{
+    padding:18px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.detail-card{
+    background:#fff;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 2px 8px rgba(15,23,42,.06);
+    border-top:4px solid #0d9488;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.detail-card-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.detail-card-head h4{
+    margin:0 0 2px;
+    font-size:15px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.detail-card-head p{
+    margin:0;
+    font-size:12px;
+    color:#64748b;
+}
+
+.detail-card-label{
+    font-size:11px;
+    color:#64748b;
+    text-transform:uppercase;
+    font-weight:700;
+    letter-spacing:.5px;
+}
+
+.detail-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.detail-row > .material-icons{
+    font-size:20px;
+    color:#0d9488;
+    flex-shrink:0;
+    margin-top:1px;
+}
+
+.detail-row > div{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    gap:2px;
+}
+
+.detail-row-label{
+    font-size:10px;
+    color:#94a3b8;
+    text-transform:uppercase;
+    font-weight:600;
+    letter-spacing:.4px;
+}
+
+.detail-row-value{
+    font-size:14px;
+    color:#0f172a;
+    font-weight:600;
+    word-break:break-word;
+}
+
+a.detail-row-value{
+    color:#0d9488;
+    text-decoration:none;
+}
+
+a.detail-row-value[href]:hover{
+    text-decoration:underline;
 }
 
 /* ================= ACCOUNT MODAL ================= */
