@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 15, 2026 at 07:35 AM
+-- Generation Time: May 22, 2026 at 03:25 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,7 +39,7 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `username`, `password_hash`, `created_at`) VALUES
-(2, 'admin', '$2y$10$L3WFUYS4K3vy8WjvNyozKu9xjR9bEifAJSDC1vjXZfLQMogN70gpO', '2026-05-04 11:47:18');
+(2, 'admin', '$2y$10$G.eR2ddiL28G4M9VVW0mzuRPSnKhB6awdQxbaBVhi5vGP63TxerIa', '2026-05-04 11:47:18');
 
 -- --------------------------------------------------------
 
@@ -64,7 +64,39 @@ INSERT INTO `admin_logs` (`id`, `admin_id`, `action`, `target`, `details`, `crea
 (1, 2, 'Logged in', NULL, NULL, '2026-05-15 04:52:30'),
 (2, 2, 'Logged in', NULL, NULL, '2026-05-15 05:02:48'),
 (3, 2, 'Edited resident', 'Lucy Gomez Martinez', NULL, '2026-05-15 05:29:51'),
-(4, 2, 'Edited resident', 'Angela Lopez Mendoza', NULL, '2026-05-15 05:30:06');
+(4, 2, 'Edited resident', 'Angela Lopez Mendoza', NULL, '2026-05-15 05:30:06'),
+(5, 2, 'Logged in', NULL, NULL, '2026-05-15 05:41:31'),
+(6, 2, 'Logged in', NULL, NULL, '2026-05-15 05:48:21'),
+(7, 2, 'Logged in', NULL, NULL, '2026-05-15 10:42:28'),
+(8, 2, 'Logged in', NULL, NULL, '2026-05-20 16:19:21'),
+(9, 2, 'Exported residents', 'CSV', '7 record(s)', '2026-05-20 16:32:50'),
+(10, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:32:54'),
+(11, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:33:25'),
+(12, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:34:41'),
+(13, 2, 'Exported residents', 'CSV', '7 record(s)', '2026-05-20 16:34:46'),
+(14, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:35:15'),
+(15, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:35:51'),
+(16, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:36:42'),
+(17, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:37:27'),
+(18, 2, 'Exported residents', 'CSV', '7 record(s)', '2026-05-20 16:40:24'),
+(19, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:40:26'),
+(20, 2, 'Logged in', NULL, NULL, '2026-05-20 16:43:52'),
+(21, 2, 'Logged in', NULL, NULL, '2026-05-20 16:44:15'),
+(22, 2, 'Logged in', NULL, NULL, '2026-05-20 16:49:03'),
+(23, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:49:42'),
+(24, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 16:57:08'),
+(25, 2, 'Logged in', NULL, NULL, '2026-05-20 16:58:03'),
+(26, 2, 'Logged in', NULL, NULL, '2026-05-20 17:05:24'),
+(27, 2, 'Exported residents', 'PDF', '7 record(s)', '2026-05-20 17:05:39'),
+(28, 2, 'Logged in', NULL, NULL, '2026-05-21 04:16:11'),
+(29, 2, 'Logged in', NULL, NULL, '2026-05-21 04:21:10'),
+(30, 2, 'Exported residents', 'PDF', '8 record(s)', '2026-05-21 04:21:25'),
+(31, 2, 'Exported residents', 'PDF', '8 record(s)', '2026-05-21 04:22:18'),
+(32, 2, 'Logged in', NULL, NULL, '2026-05-21 04:28:24'),
+(33, 2, 'Deleted resident', 'Abdul Jakul Salsalagi', NULL, '2026-05-21 04:28:35'),
+(34, 2, 'Logged in', NULL, NULL, '2026-05-21 04:42:24'),
+(35, 2, 'Logged in', NULL, NULL, '2026-05-22 01:23:26'),
+(36, 2, 'Deleted resident', 'Mark Joshua Apor', NULL, '2026-05-22 01:23:36');
 
 -- --------------------------------------------------------
 
@@ -169,25 +201,25 @@ ALTER TABLE `survey_responses`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
