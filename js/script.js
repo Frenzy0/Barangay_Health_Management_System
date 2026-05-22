@@ -546,7 +546,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(r => r.json())
             .then(data => {
                 if (!data.success) {
-                    showToast("error", "Update Failed", data.error || "Could not update the resident.");
+                    const isDuplicate = /already exists/i.test(data.error || "");
+                    showToast("error",
+                        isDuplicate ? "Duplicate Resident" : "Update Failed",
+                        data.error || "Could not update the resident.");
                     return;
                 }
                 const cells = currentEditRow.querySelectorAll("td");
@@ -616,7 +619,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(r => r.json())
             .then(data => {
                 if (!data.success) {
-                    showToast("error", "Failed to Add", data.error || "Could not add the resident.");
+                    const isDuplicate = /already exists/i.test(data.error || "");
+                    showToast("error",
+                        isDuplicate ? "Duplicate Resident" : "Failed to Add",
+                        data.error || "Could not add the resident.");
                     return;
                 }
                 const emptyRow = document.getElementById("emptyRow");
@@ -976,8 +982,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(data => {
                     if (data.success) {
                         surveyForm.reset();
-                        showToast("success", "Survey Submitted",
-                            "Health survey saved. The dashboard and residents list have been updated.");
+                        showToast("success",
+                            data.updated ? "Survey Updated" : "Survey Submitted",
+                            data.updated
+                                ? "This resident already had a survey on record, so their existing response was updated."
+                                : "Health survey saved. The dashboard and residents list have been updated.");
                     } else {
                         showToast("error", "Submission Failed",
                             data.error || "Please check your input and try again.");

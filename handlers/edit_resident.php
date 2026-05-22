@@ -46,6 +46,21 @@ $suffix_db = $suffix !== '' ? $suffix : null;
 $middle_name_part = ($middle === 'N/A') ? '' : $middle;
 $full_name = trim(preg_replace('/\s+/', ' ', "$first $middle_name_part $last"));
 
+// Reject if another resident (id <> this one) already has the same name AND
+// birthdate. Name alone is not unique, so birthdate is part of the check.
+$dup = $conn->prepare(
+    "SELECT id FROM residents
+     WHERE first_name = ? AND middle_name = ? AND last_name = ?
+       AND birthdate = ? AND suffix <=> ? AND id <> ?
+     LIMIT 1"
+);
+$dup->bind_param('sssssi', $first, $middle, $last, $bd, $suffix_db, $id);
+$dup->execute();
+if ($dup->get_result()->fetch_assoc()) {
+    echo json_encode(['success' => false, 'error' => 'Another resident with the same name and birthdate already exists.']);
+    exit;
+}
+
 $stmt = $conn->prepare(
     "UPDATE residents
      SET first_name=?, middle_name=?, last_name=?, full_name=?, suffix=?,

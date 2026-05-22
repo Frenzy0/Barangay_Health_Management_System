@@ -103,16 +103,20 @@ if (!in_array($ec_rel, $ok_rel)) {
     exit;
 }
 
-// Match resident by first/middle/last + suffix (case-insensitive). If found, update demographics; otherwise create.
+// Match resident by name + suffix + birthdate. A name alone is not unique
+// (two different people can share a name), so birthdate is part of the match
+// to avoid attaching this survey to the wrong person. If found, update
+// demographics; otherwise create a new resident.
 $lookup = $conn->prepare(
     "SELECT id FROM residents
      WHERE LOWER(first_name) = LOWER(?)
        AND LOWER(middle_name) = LOWER(?)
        AND LOWER(last_name) = LOWER(?)
        AND COALESCE(LOWER(suffix), '') = COALESCE(LOWER(?), '')
+       AND birthdate = ?
      LIMIT 1"
 );
-$lookup->bind_param('ssss', $first, $middle, $last, $suffix_db);
+$lookup->bind_param('sssss', $first, $middle, $last, $suffix_db, $birthdate);
 $lookup->execute();
 $existing = $lookup->get_result()->fetch_assoc();
 
@@ -134,23 +138,50 @@ if ($existing) {
     $resident_id = $conn->insert_id;
 }
 
-// Insert the survey response
-$stmt = $conn->prepare(
-    "INSERT INTO survey_responses
-        (resident_id, vaccination_status, last_checkup,
-         has_fever, has_cough, has_fatigue, has_headache, no_symptoms, health_notes,
-         ec_first_name, ec_middle_name, ec_last_name, ec_contact_number, ec_relationship)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-);
-$stmt->bind_param(
-    'issiiiiissssss',
-    $resident_id, $vaccination, $last_checkup,
-    $has_fever, $has_cough, $has_fatigue, $has_headache, $no_symptoms, $notes,
-    $ec_first, $ec_middle, $ec_last, $ec_number, $ec_rel
-);
+// One survey per resident: if this resident already has a response, overwrite
+// it with the new answers instead of inserting a duplicate row.
+$found = $conn->prepare("SELECT id FROM survey_responses WHERE resident_id = ? LIMIT 1");
+$found->bind_param('i', $resident_id);
+$found->execute();
+$existing_survey = $found->get_result()->fetch_assoc();
+
+if ($existing_survey) {
+    $survey_id = (int)$existing_survey['id'];
+    $stmt = $conn->prepare(
+        "UPDATE survey_responses SET
+            vaccination_status = ?, last_checkup = ?,
+            has_fever = ?, has_cough = ?, has_fatigue = ?, has_headache = ?, no_symptoms = ?,
+            health_notes = ?,
+            ec_first_name = ?, ec_middle_name = ?, ec_last_name = ?,
+            ec_contact_number = ?, ec_relationship = ?,
+            submitted_at = CURRENT_TIMESTAMP
+         WHERE id = ?"
+    );
+    $stmt->bind_param(
+        'ssiiiiissssssi',
+        $vaccination, $last_checkup,
+        $has_fever, $has_cough, $has_fatigue, $has_headache, $no_symptoms, $notes,
+        $ec_first, $ec_middle, $ec_last, $ec_number, $ec_rel,
+        $survey_id
+    );
+} else {
+    $stmt = $conn->prepare(
+        "INSERT INTO survey_responses
+            (resident_id, vaccination_status, last_checkup,
+             has_fever, has_cough, has_fatigue, has_headache, no_symptoms, health_notes,
+             ec_first_name, ec_middle_name, ec_last_name, ec_contact_number, ec_relationship)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    );
+    $stmt->bind_param(
+        'issiiiiissssss',
+        $resident_id, $vaccination, $last_checkup,
+        $has_fever, $has_cough, $has_fatigue, $has_headache, $no_symptoms, $notes,
+        $ec_first, $ec_middle, $ec_last, $ec_number, $ec_rel
+    );
+}
 
 if ($stmt->execute()) {
-    echo json_encode(['success' => true]);
+    echo json_encode(['success' => true, 'updated' => (bool)$existing_survey]);
 } else {
     echo json_encode(['success' => false, 'error' => 'DB error: ' . $conn->error]);
 }

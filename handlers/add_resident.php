@@ -45,6 +45,22 @@ $suffix_db = $suffix !== '' ? $suffix : null;
 $middle_name_part = ($middle === 'N/A') ? '' : $middle;
 $full_name = trim(preg_replace('/\s+/', ' ', "$first $middle_name_part $last"));
 
+// A name alone is not unique (two different people can share a name), so a
+// resident counts as a duplicate only when the full name AND birthdate match.
+// `<=>` is MySQL's NULL-safe equality, needed because suffix may be NULL.
+$dup = $conn->prepare(
+    "SELECT id FROM residents
+     WHERE first_name = ? AND middle_name = ? AND last_name = ?
+       AND birthdate = ? AND suffix <=> ?
+     LIMIT 1"
+);
+$dup->bind_param('sssss', $first, $middle, $last, $bd, $suffix_db);
+$dup->execute();
+if ($dup->get_result()->fetch_assoc()) {
+    echo json_encode(['success' => false, 'error' => 'A resident with the same name and birthdate already exists.']);
+    exit;
+}
+
 $stmt = $conn->prepare(
     "INSERT INTO residents (first_name, middle_name, last_name, full_name, suffix, birthdate, age, civil_status, gender, purok)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"

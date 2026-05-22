@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2026 at 07:19 AM
+-- Generation Time: May 22, 2026 at 08:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -108,7 +108,16 @@ INSERT INTO `admin_logs` (`id`, `admin_id`, `action`, `target`, `details`, `crea
 (45, 2, 'Edited resident', 'David Barry Martinez', NULL, '2026-05-22 05:13:09'),
 (46, 2, 'Edited resident', 'Lucy Gomez Martinez', NULL, '2026-05-22 05:13:16'),
 (47, 2, 'Edited resident', 'Pearl Lumen Douglas Sr', NULL, '2026-05-22 05:13:20'),
-(48, 2, 'Edited resident', 'Samantha Panelo Santos', NULL, '2026-05-22 05:13:22');
+(48, 2, 'Edited resident', 'Samantha Panelo Santos', NULL, '2026-05-22 05:13:22'),
+(49, 2, 'Logged in', NULL, NULL, '2026-05-22 05:22:17'),
+(50, 2, 'Logged in', NULL, NULL, '2026-05-22 05:36:55'),
+(51, 2, 'Edited resident', 'John Llyod Natividad Cruz', NULL, '2026-05-22 05:37:37'),
+(52, 2, 'Logged in', NULL, NULL, '2026-05-22 05:40:01'),
+(53, 2, 'Edited resident', 'Juan Dela Cruz', NULL, '2026-05-22 05:43:22'),
+(54, 2, 'Edited resident', 'Juan Dela Cruz', NULL, '2026-05-22 05:47:09'),
+(55, 2, 'Deleted resident', 'Juan Dela Cruz', NULL, '2026-05-22 05:47:12'),
+(56, 2, 'Edited resident', 'Juan Dela Cruz', NULL, '2026-05-22 05:53:00'),
+(57, 2, 'Logged in', NULL, NULL, '2026-05-22 06:05:21');
 
 -- --------------------------------------------------------
 
@@ -138,11 +147,12 @@ CREATE TABLE `residents` (
 INSERT INTO `residents` (`id`, `first_name`, `middle_name`, `last_name`, `full_name`, `suffix`, `birthdate`, `age`, `civil_status`, `gender`, `purok`, `created_at`) VALUES
 (1, 'David', 'Barry', 'Martinez', 'David Barry Martinez', NULL, '1999-05-20', 26, 'Single', 'Male', 'Purok 4', '2026-05-15 04:52:18'),
 (2, 'Pearl', 'Lumen', 'Douglas', 'Pearl Lumen Douglas', 'Sr', '1965-03-12', 61, 'Married', 'Female', 'Purok 3', '2026-05-15 05:03:48'),
-(3, 'Juan', '', 'Dela Cruz', 'Juan Dela Cruz', NULL, '2001-12-09', 24, 'Single', 'Male', 'Purok 1', '2026-05-15 05:16:12'),
 (4, 'Lucy', 'Gomez', 'Martinez', 'Lucy Gomez Martinez', NULL, '2003-07-29', 22, 'Single', 'Female', 'Purok 3', '2026-05-15 05:19:29'),
-(5, 'John', 'Lloyd', 'Cruz', 'John Lloyd Cruz', NULL, '1983-05-24', 42, 'Married', 'Male', 'Purok 2', '2026-05-15 05:25:19'),
+(5, 'John Llyod', 'Natividad', 'Cruz', 'John Llyod Natividad Cruz', NULL, '1983-05-24', 42, 'Married', 'Male', 'Purok 2', '2026-05-15 05:25:19'),
 (6, 'Angela', 'Lopez', 'Mendoza', 'Angela Lopez Mendoza', NULL, '1994-07-03', 31, 'Single', 'Female', 'Purok 5', '2026-05-15 05:29:23'),
-(7, 'Samantha', 'Panelo', 'Santos', 'Samantha Panelo Santos', NULL, '2002-06-29', 23, 'Single', 'Female', 'Purok 4', '2026-05-15 05:34:50');
+(7, 'Samantha', 'Panelo', 'Santos', 'Samantha Panelo Santos', NULL, '2002-06-29', 23, 'Single', 'Female', 'Purok 4', '2026-05-15 05:34:50'),
+(11, 'Lily', 'Santos', 'Canonigo', 'Lily Santos Canonigo', NULL, '2001-12-05', 24, 'Single', 'Male', 'Purok 2', '2026-05-22 05:22:08'),
+(12, 'Juan', 'N/A', 'Dela Cruz', 'Juan Dela Cruz', NULL, '2001-12-09', 24, 'Single', 'Male', 'Purok 1', '2026-05-22 05:42:47');
 
 -- --------------------------------------------------------
 
@@ -176,11 +186,12 @@ CREATE TABLE `survey_responses` (
 INSERT INTO `survey_responses` (`id`, `resident_id`, `vaccination_status`, `last_checkup`, `has_fever`, `has_cough`, `has_fatigue`, `has_headache`, `no_symptoms`, `health_notes`, `ec_first_name`, `ec_middle_name`, `ec_last_name`, `ec_contact_number`, `ec_relationship`, `submitted_at`) VALUES
 (1, 1, 'Vaccinated', '2026-05-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 04:52:18'),
 (2, 2, 'Unvaccinated', '2026-03-20', 1, 1, 1, 1, 0, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:03:48'),
-(3, 3, 'Vaccinated', '2026-02-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:16:12'),
 (4, 4, 'Vaccinated', '2025-12-03', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:19:29'),
 (5, 5, 'Vaccinated', '2026-01-29', 1, 0, 0, 1, 0, 'Nagsusuka', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:25:19'),
 (6, 6, 'Unvaccinated', '2025-03-19', 0, 0, 0, 0, 1, '', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:29:23'),
-(7, 7, 'Unvaccinated', '2026-01-25', 0, 1, 1, 0, 0, 'di makahinga', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:34:50');
+(7, 7, 'Unvaccinated', '2026-01-25', 0, 1, 1, 0, 0, 'di makahinga', NULL, NULL, NULL, NULL, NULL, '2026-05-15 05:34:50'),
+(11, 11, 'Vaccinated', '2025-12-03', 0, 0, 0, 0, 1, '', 'Emily', 'Santos', 'Canonigo', '09742312312', 'Grandparent', '2026-05-22 05:22:08'),
+(12, 12, 'Vaccinated', '2026-03-03', 0, 0, 0, 0, 1, '', 'Justine', 'N/A', 'Dela Cruz', '09234581312', 'Guardian', '2026-05-22 05:42:47');
 
 --
 -- Indexes for dumped tables
@@ -204,7 +215,8 @@ ALTER TABLE `admin_logs`
 -- Indexes for table `residents`
 --
 ALTER TABLE `residents`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uniq_person` (`first_name`,`middle_name`,`last_name`,`birthdate`,`suffix`);
 
 --
 -- Indexes for table `survey_responses`
@@ -227,19 +239,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `admin_logs`
 --
 ALTER TABLE `admin_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `residents`
 --
 ALTER TABLE `residents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
