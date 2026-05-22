@@ -16,10 +16,13 @@ A walkthrough of how the Barangay Health Management System works. Each section s
 10. [Activity Logging (helpers/log.php)](#9-activity-logging-helperslogphp)
 11. [The Dashboard (dashboard.php)](#10-the-dashboard-dashboardphp)
 12. [Managing Residents (residents.php)](#11-managing-residents-residentsphp)
-13. [Adding/Deleting Residents (handlers)](#12-addingdeleting-residents-handlers)
-14. [Health Notes (notes.php)](#13-health-notes-notesphp)
-15. [Logging Out (logout.php)](#14-logging-out-logoutphp)
-16. [Quick Glossary](#quick-glossary)
+13. [Adding/Editing/Deleting Residents (handlers)](#12-addingeditingdeleting-residents-handlers)
+14. [Account Settings (includes/account_modal.php)](#13-account-settings-includesaccount_modalphp)
+15. [Exporting Residents (handlers/export_residents.php)](#14-exporting-residents-handlersexport_residentsphp)
+16. [Health Notes (notes.php)](#15-health-notes-notesphp)
+17. [Printable Blank Form (print_survey.php)](#16-printable-blank-form-print_surveyphp)
+18. [Logging Out (logout.php)](#17-logging-out-logoutphp)
+19. [Quick Glossary](#quick-glossary)
 
 ---
 
@@ -28,7 +31,7 @@ A walkthrough of how the Barangay Health Management System works. Each section s
 The system has two kinds of users:
 
 - **Residents** — fill out a health survey on the homepage. No login needed.
-- **Admin** — logs in and can view stats, add/edit/delete residents, and check health notes.
+- **Admin** — logs in and can view stats, add/edit/delete residents, export records, check health notes, and manage their own account.
 
 Behind the scenes, PHP runs on the server, MySQL stores the data, and HTML/CSS/JavaScript show the pages in the browser.
 
@@ -45,9 +48,26 @@ We have 4 tables:
 | Table | What it stores |
 |---|---|
 | `admins` | Admin username + hashed password |
-| `admin_logs` | History of what the admin did (login, edit, etc.) |
+| `admin_logs` | History of what the admin did (login, edit, export, etc.) |
 | `residents` | Personal info of each resident |
-| `survey_responses` | Each health survey submitted |
+| `survey_responses` | Each health survey submitted, plus the emergency contact |
+
+A resident's name is stored in **separate parts** so we can search and match people accurately:
+
+```sql
+CREATE TABLE `residents` (
+  `id` int(11) NOT NULL,
+  `first_name` varchar(50) NOT NULL DEFAULT '',
+  `middle_name` varchar(50) NOT NULL DEFAULT '',
+  `last_name` varchar(50) NOT NULL DEFAULT '',
+  `full_name` varchar(100) NOT NULL,
+  `suffix` varchar(10) DEFAULT NULL,
+  `birthdate` date NOT NULL,
+  ...
+);
+```
+
+`first_name`, `middle_name`, and `last_name` are the editable parts. `full_name` is just those parts joined together for easy display.
 
 The important link: every `survey_responses` row has a `resident_id` that connects it to one row in `residents`.
 
@@ -58,10 +78,23 @@ CREATE TABLE `survey_responses` (
   `vaccination_status` enum('Vaccinated','Unvaccinated','Partially Vaccinated') NOT NULL,
   `has_fever` tinyint(1) DEFAULT 0,
   ...
+  `ec_first_name` varchar(50) DEFAULT NULL,
+  `ec_contact_number` varchar(15) DEFAULT NULL,
+  `ec_relationship` enum('Parent','Spouse','Sibling',...) DEFAULT NULL,
+  ...
 );
 ```
 
-**Why this matters:** one resident can submit many surveys over time. We use the `resident_id` to know which surveys belong to whom.
+The `ec_` columns hold the **emergency contact** — the person to call if something happens to the resident.
+
+**No duplicate people:** the database refuses to store the same person twice.
+
+```sql
+ALTER TABLE `residents`
+  ADD UNIQUE KEY `uniq_person` (`first_name`,`middle_name`,`last_name`,`birthdate`,`suffix`);
+```
+
+A `UNIQUE KEY` means MySQL will reject any insert where all five of those fields match an existing row. Why all five? Because two different people can share a name — so the name **plus the birthdate** is what makes a person unique.
 
 `ON DELETE CASCADE` means: if a resident is deleted, all their surveys are automatically deleted too — no leftover data.
 
@@ -93,13 +126,20 @@ This page is run only once to make the first admin account.
 
 ```php
 $username = 'admin';
-$password = 'admin123';
+$password = 'BhmsAdmin@2026';
 $hash = password_hash($password, PASSWORD_DEFAULT);
+
+$stmt = $conn->prepare(
+    "INSERT INTO admins (username, password_hash) VALUES (?, ?)
+     ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)"
+);
 ```
 
 **Important:** we never store the plain password. `password_hash()` turns it into a long, scrambled string that can't be reversed. Later, when the user logs in, we use `password_verify()` to check if the password they typed matches that scrambled version.
 
-**Why:** even if someone steals the database, they still can't read the real passwords.
+`ON DUPLICATE KEY UPDATE` means: if the `admin` account already exists, just refresh its password instead of erroring out — so re-running the page is safe.
+
+**Why:** even if someone steals the database, they still can't read the real passwords. The page also reminds you to delete `setup_admin.php` after the first run.
 
 ---
 
@@ -126,18 +166,25 @@ Every admin page starts with `require 'auth.php';` so random people can't open t
 
 ## 5. Resident Survey Form (index.php)
 
-This is the homepage that any resident can use.
+This is the homepage that any resident can use. It has three sections: **Personal Information**, **Health Status**, and **Emergency Contact**.
+
+The name is collected in separate boxes — first, middle, last, and an optional suffix:
 
 ```html
-<form id="surveyForm" method="POST" action="" novalidate>
-    <input type="text" name="full_name" placeholder="Juan Dela Cruz">
-    <input type="date" name="birthdate" id="surveyBirthdate">
-    <input type="number" name="age" id="surveyAge" min="0" max="120">
-    ...
-</form>
+<input type="text" name="first_name" placeholder="Juan">
+<div class="input-with-na">
+    <input type="text" name="middle_name" id="surveyMiddleName" placeholder="Santos">
+    <label class="na-toggle" title="No middle name">
+        <input type="checkbox" id="surveyMiddleNameNA"> N/A
+    </label>
+</div>
+<input type="text" name="last_name" placeholder="Dela Cruz">
+<input type="text" name="suffix" placeholder="e.g. Jr." maxlength="10">
 ```
 
-A regular HTML form. The `name` attribute on each input is the key PHP uses to read the value later (`$_POST['full_name']`, etc.).
+**The "N/A" checkbox:** some people genuinely have no middle name. Instead of leaving the box empty (which the form would reject as missing), the resident ticks **N/A** and the field is filled with the text `N/A`. The server understands this special value and skips that person's middle name when building the full name.
+
+The form also has an Emergency Contact section (`name="ec_first_name"`, `name="ec_contact_number"`, etc.) and a "Print Blank Form" button that opens [print_survey.php](#16-printable-blank-form-print_surveyphp).
 
 A small JavaScript trick auto-fills the age when a birthday is picked:
 
@@ -148,7 +195,8 @@ bd.addEventListener('change', () => {
     let a = today.getFullYear() - d.getFullYear();
     const m = today.getMonth() - d.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < d.getDate())) a--;
-    if (a >= 0 && a <= 120) age.value = a;
+    if (a >= 1 && a <= 120) age.value = a;
+    else age.value = "";
 });
 ```
 
@@ -163,48 +211,79 @@ This is the most important "back-end" file. When the resident clicks Submit, the
 **Step 1 — Read the form values:**
 
 ```php
-$name      = trim($_POST['full_name'] ?? '');
+$first     = trim($_POST['first_name']  ?? '');
+$middle    = trim($_POST['middle_name'] ?? '');
+$last      = trim($_POST['last_name']   ?? '');
 $age       = (int)($_POST['age'] ?? 0);
 $symptoms  = $_POST['symptoms'] ?? [];
 $has_fever = in_array('fever', $symptoms) ? 1 : 0;
+// Emergency contact
+$ec_first  = trim($_POST['ec_first_name'] ?? '');
+$ec_number = trim($_POST['ec_contact_number'] ?? '');
 ```
 
-`trim()` removes accidental spaces. `(int)` makes sure the age is a real number. We check the symptom checkboxes — if "fever" was ticked, save `1`; otherwise `0`.
+`trim()` removes accidental spaces. `(int)` makes sure the age is a real number. We check the symptom checkboxes — if "fever" was ticked, save `1`; otherwise `0`. The same is done for the emergency-contact fields.
 
-**Step 2 — Validate (check the data is correct):**
+**Step 2 — Handle the "N/A" middle name:**
 
 ```php
-if (!$name || !preg_match('/^[A-Za-z\s.\-\']+$/', $name)) {
-    echo json_encode(['success' => false, 'error' => 'Full name may only contain letters...']);
+if (strcasecmp($middle, 'N/A') === 0) $middle = 'N/A';
+...
+$middle_name_part = ($middle === 'N/A') ? '' : $middle;
+$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle_name_part $last"));
+```
+
+If the resident typed "n/a" in any letter case, we store it neatly as `N/A`. When we build the display `full_name`, an `N/A` middle name is left out — so "Juan N/A Dela Cruz" displays simply as "Juan Dela Cruz".
+
+**Step 3 — Validate (check the data is correct):**
+
+```php
+$name_re = '/^[A-Za-z\s.\-\']+$/';
+foreach (['First name' => $first, 'Middle name' => $middle, 'Last name' => $last] as $label => $val) {
+    if ($label === 'Middle name' && $val === 'N/A') continue;
+    if ($val === '' || !preg_match($name_re, $val)) {
+        echo json_encode(['success' => false, 'error' => "$label is required..."]);
+        exit;
+    }
+}
+if (!preg_match('/^09\d{9}$/', $ec_number)) {
+    echo json_encode(['success' => false, 'error' => 'Contact number must be 11 digits and start with 09...']);
     exit;
 }
 ```
 
-We reject names with numbers or strange symbols, ages over 120, birthdays in the future, etc. Never trust what the user typed — always check.
+We reject names with numbers or strange symbols, ages outside 1–120, birthdays or checkup dates in the future, and contact numbers that aren't an 11-digit `09xxxxxxxxx`. Never trust what the user typed — always check.
 
-**Step 3 — Insert or update the resident:**
+**Step 4 — Find the resident, or create them:**
 
 ```php
 $lookup = $conn->prepare(
     "SELECT id FROM residents
-      WHERE LOWER(full_name) = LOWER(?)
-        AND COALESCE(LOWER(suffix), '') = COALESCE(LOWER(?), '')
-      LIMIT 1"
+     WHERE LOWER(first_name) = LOWER(?)
+       AND LOWER(middle_name) = LOWER(?)
+       AND LOWER(last_name) = LOWER(?)
+       AND COALESCE(LOWER(suffix), '') = COALESCE(LOWER(?), '')
+       AND birthdate = ?
+     LIMIT 1"
 );
 ```
 
-We look for a resident with the same name. If found → update them. If not → create a new resident record.
+We look for a resident with the same name parts **and birthdate**. A name alone is not unique (two different people can share a name), so the birthdate is part of the match — this stops a survey being attached to the wrong person. If found → update their details. If not → create a new resident record.
 
-**Step 4 — Save the survey:**
+**Step 5 — Save the survey (one survey per resident):**
 
 ```php
-$stmt = $conn->prepare(
-    "INSERT INTO survey_responses
-        (resident_id, vaccination_status, last_checkup, has_fever, ...)
-     VALUES (?, ?, ?, ?, ...)"
-);
-$stmt->bind_param('issiiiiis', $resident_id, $vaccination, ...);
+$found = $conn->prepare("SELECT id FROM survey_responses WHERE resident_id = ? LIMIT 1");
+...
+if ($existing_survey) {
+    $stmt = $conn->prepare("UPDATE survey_responses SET vaccination_status = ?, ... WHERE id = ?");
+} else {
+    $stmt = $conn->prepare("INSERT INTO survey_responses (resident_id, vaccination_status, ...) VALUES (?, ?, ...)");
+}
+$stmt->bind_param('issiiiiis...', $resident_id, $vaccination, ...);
 ```
+
+Each resident keeps **one** survey response. If they already have one, the new answers **overwrite** the old row instead of adding a duplicate.
 
 **Why use `prepare()` + `bind_param()` instead of plain SQL?** This is called a prepared statement. It protects against SQL injection — a famous trick where a hacker types something like `'; DROP TABLE residents; --` into a form to mess up the database. Prepared statements treat user input as data, not code, so the attack fails.
 
@@ -217,21 +296,21 @@ Finally, the page sends back a JSON response like `{"success": true}` and JavaSc
 A normal HTML form pointing to `handlers/login.php`:
 
 ```html
-<form method="POST" action="handlers/login.php" class="login-form">
-    <input type="text" name="username" required>
-    <input type="password" name="password" required>
-    <button type="submit">Sign In</button>
+<form method="POST" action="handlers/login.php" class="login-form" id="loginForm" novalidate>
+    <input type="text" id="username" name="username">
+    <input type="password" id="password" name="password">
+    <button type="submit" class="login-submit-btn">Sign In</button>
 </form>
 ```
 
-It also has a small "eye" button to show/hide the password — just for user convenience.
+It has a small "eye" button to show/hide the password, and JavaScript that checks the typed password **before** sending — it must be 12+ characters with an uppercase letter, a lowercase letter, a number, and a special character. If a check fails, a toast (small popup notice) appears and the form is not submitted.
 
 ---
 
 ## 8. Checking the Login (handlers/login.php)
 
 ```php
-$stmt = $conn->prepare("SELECT id, username, password_hash FROM admins WHERE username = ? LIMIT 1");
+$stmt = $conn->prepare("SELECT id, username, password_hash FROM admins WHERE BINARY username = ? LIMIT 1");
 $stmt->bind_param('s', $username);
 $stmt->execute();
 $admin = $stmt->get_result()->fetch_assoc();
@@ -244,17 +323,18 @@ if (!$admin || !password_verify($password, $admin['password_hash'])) {
 
 $_SESSION['admin_id']       = $admin['id'];
 $_SESSION['admin_username'] = $admin['username'];
+$_SESSION['fresh_login']    = true;
 
 logAction($conn, 'Logged in');
-
 header('Location: ../dashboard.php');
 ```
 
 **In simple terms:**
-1. Look up the admin by username.
+1. Look up the admin by username. `BINARY` makes the match **case-sensitive** — `Admin` and `admin` are treated as different usernames.
 2. If not found, or the password doesn't match the saved hash → show error.
 3. If it matches → save the admin's id in the session (so other pages know they're logged in) and send them to the dashboard.
-4. Record the login in the activity log.
+4. `fresh_login` is a one-time flag the dashboard reads to reset the sidebar to its open state right after logging in.
+5. Record the login in the activity log.
 
 `password_verify()` is the secure way to compare a typed password against the hashed one in the database.
 
@@ -264,7 +344,12 @@ header('Location: ../dashboard.php');
 
 ```php
 function logAction($conn, $action, $target = null, $details = null) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if (empty($_SESSION['admin_id'])) return;
+
+    $admin_id = $_SESSION['admin_id'];
     $stmt = $conn->prepare(
         "INSERT INTO admin_logs (admin_id, action, target, details) VALUES (?, ?, ?, ?)"
     );
@@ -273,7 +358,7 @@ function logAction($conn, $action, $target = null, $details = null) {
 }
 ```
 
-A reusable helper. Every time the admin does something important (login, add, edit, delete) we call this function so it gets saved in the `admin_logs` table. This way the admin can review their own activity later.
+A reusable helper. Every time the admin does something important (login, add, edit, delete, export, change password) we call this function so it gets saved in the `admin_logs` table. The admin can review this history later in the Activity Log tab of [Account Settings](#13-account-settings-includesaccount_modalphp).
 
 ---
 
@@ -310,7 +395,7 @@ LEFT JOIN survey_responses sr ON sr.id = (
 ```php
 <?php foreach ($rows as $row): ?>
     <tr>
-        <td><?= htmlspecialchars($row['full_name']) ?></td>
+        <td><?= htmlspecialchars($row_display) ?></td>
         <td><?= htmlspecialchars($row['gender']) ?></td>
         ...
     </tr>
@@ -325,38 +410,48 @@ The filter cards (Total, Male, Vaccinated, etc.) use a `data-filter` attribute, 
 
 ## 11. Managing Residents (residents.php)
 
-Very similar to the dashboard, but each row has Edit and Delete buttons:
+Very similar to the dashboard, but each row has Edit and Delete buttons, and the row carries the resident's name parts in `data-` attributes so JavaScript can pre-fill the Edit modal:
 
 ```html
-<button class="edit-btn editResidentBtn">
-    <span class="material-icons">edit_note</span> Edit
-</button>
-<button class="delete-btn deleteResidentBtn">
-    <span class="material-icons">delete_outline</span>
-</button>
+<tr data-id="..." data-firstname="..." data-middlename="..."
+    data-lastname="..." data-suffix="...">
+    ...
+    <button class="edit-btn editResidentBtn"><span class="material-icons">edit_note</span> Edit</button>
+    <button class="delete-btn deleteResidentBtn"><span class="material-icons">delete_outline</span></button>
+</tr>
 ```
 
-It also includes modals (popup boxes) for Add, Edit, and Delete confirmation. The JavaScript opens these modals, fills them with the resident's current data, and then sends the form to the right handler file.
+The page includes modals (popup boxes) for **Add**, **Edit**, and **Delete confirmation**. The Add and Edit modals collect the name in separate first/middle/last/suffix boxes, and the Age field is `readonly` because it is auto-calculated from the birthdate. JavaScript opens these modals, fills them with the resident's current data, and sends the form to the right handler file.
+
+There are also **Export CSV** and **Export PDF** buttons that link to [export_residents.php](#14-exporting-residents-handlersexport_residentsphp).
 
 ---
 
-## 12. Adding/Deleting Residents (handlers)
+## 12. Adding/Editing/Deleting Residents (handlers)
 
-**Add (handlers/add_resident.php):**
+**Add (handlers/add_resident.php):** validates the input, then checks for a duplicate person before inserting:
 
 ```php
-$stmt = $conn->prepare(
-    "INSERT INTO residents (full_name, suffix, birthdate, age, civil_status, gender, purok)
-     VALUES (?, ?, ?, ?, ?, ?, ?)"
+$dup = $conn->prepare(
+    "SELECT id FROM residents
+     WHERE first_name = ? AND middle_name = ? AND last_name = ?
+       AND birthdate = ? AND suffix <=> ?
+     LIMIT 1"
 );
-$stmt->bind_param('sssisss', $name, $suffix_db, $bd, $age, $status, $gender, $purok);
-if ($stmt->execute()) {
-    logAction($conn, 'Added resident', $name);
-    echo json_encode(['success' => true]);
-}
+$dup->bind_param('sssss', $first, $middle, $last, $bd, $suffix_db);
 ```
 
-Validate input → insert → log it → respond with JSON.
+If a resident with the **same name and birthdate** already exists, the handler refuses and returns an error. `<=>` is MySQL's NULL-safe equality — a normal `=` would fail to match when the suffix is empty (`NULL`), so `<=>` is used to compare suffixes correctly.
+
+Once it passes the check, it inserts the resident, logs the action, and responds with JSON.
+
+**Edit (handlers/edit_resident.php):** almost identical, but the duplicate check has one extra condition — `AND id <> ?` — so a resident is not flagged as a duplicate of *themselves* when you save the same person:
+
+```php
+"... AND birthdate = ? AND suffix <=> ? AND id <> ? LIMIT 1"
+```
+
+It then runs an `UPDATE` instead of an `INSERT`.
 
 **Delete (handlers/delete_resident.php):**
 
@@ -368,19 +463,89 @@ if ($stmt->execute()) {
 }
 ```
 
-Because of the `ON DELETE CASCADE` rule in the SQL, deleting one resident automatically deletes all of their surveys too.
+Because of the `ON DELETE CASCADE` rule in the SQL, deleting one resident automatically deletes their survey too.
 
 All handlers return JSON (`{"success": true}` or `{"success": false, "error": "..."}`). The JavaScript reads that and updates the page without a full reload — this is what makes the app feel quick.
 
 ---
 
-## 13. Health Notes (notes.php)
+## 13. Account Settings (includes/account_modal.php)
 
-Shows each resident as a card with their latest survey: vaccination status, last checkup, symptoms, and the notes they typed.
+This is a shared modal included on every admin page (`<?php include 'includes/account_modal.php'; ?>`). It has three tabs: **Profile**, **Password**, and **Activity Log**.
+
+**Change username (handlers/update_username.php):**
+
+```php
+if (strlen($new_username) < 3 || strlen($new_username) > 50) { ... }
+if (!preg_match('/^[A-Za-z0-9_.\-]+$/', $new_username)) { ... }
+
+$check = $conn->prepare("SELECT id FROM admins WHERE username = ? AND id != ? LIMIT 1");
+```
+
+It checks the new username is 3–50 valid characters and **not already taken** by another admin, then updates it and refreshes `$_SESSION['admin_username']` so the sidebar shows the new name immediately.
+
+**Change password (handlers/change_password.php):**
+
+```php
+if (!password_verify($old_pwd, $row['password_hash'])) {
+    echo json_encode(['success' => false, 'error' => 'Old password is incorrect.']);
+    exit;
+}
+if (password_verify($new_pwd, $row['password_hash'])) {
+    echo json_encode(['success' => false, 'error' => 'New password must be different from the old one.']);
+    exit;
+}
+$new_hash = password_hash($new_pwd, PASSWORD_DEFAULT);
+```
+
+It enforces the same strength rules as the login page (12+ characters, upper, lower, number, special), confirms the **old** password is correct, makes sure the new one is actually different, then saves the new hash.
+
+**Activity Log (handlers/get_logs.php):** returns the admin's 50 most recent actions as JSON, which JavaScript displays in the Activity tab:
+
+```php
+$stmt = $conn->prepare(
+    "SELECT action, target, details, created_at
+     FROM admin_logs WHERE admin_id = ?
+     ORDER BY created_at DESC LIMIT 50"
+);
+```
+
+---
+
+## 14. Exporting Residents (handlers/export_residents.php)
+
+This handler lets the admin download the resident list. It checks the `format` in the URL (`?format=csv` or `?format=pdf`).
+
+**CSV export** sends the data as a spreadsheet file:
+
+```php
+header('Content-Type: text/csv; charset=utf-8');
+header('Content-Disposition: attachment; filename="residents_backup_' . $fileDate . '.csv"');
+$out = fopen('php://output', 'w');
+fwrite($out, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel reads accented characters
+fputcsv($out, ['#', 'Full Name', 'Suffix', 'Birthdate', 'Age', ...]);
+```
+
+`Content-Disposition: attachment` is what makes the browser **download** the file instead of showing it. The BOM bytes at the start tell Excel the file is UTF-8.
+
+**PDF export** instead builds a clean, styled HTML report page and lets the browser's "Save as PDF" produce the file:
+
+```php
+window.addEventListener('load', () => setTimeout(() => window.print(), 400));
+```
+
+The page auto-opens the print dialog. Either way, the export is recorded in the activity log with how many records were included.
+
+---
+
+## 15. Health Notes (notes.php)
+
+Shows each resident as a card with their latest survey: vaccination status, last checkup, symptoms, the notes they typed, and their emergency contact.
 
 ```php
 $res = $conn->query("
-    SELECT r.full_name, sr.vaccination_status, sr.health_notes, sr.submitted_at, ...
+    SELECT r.full_name, sr.vaccination_status, sr.health_notes, sr.submitted_at,
+           sr.ec_first_name, sr.ec_last_name, sr.ec_contact_number, sr.ec_relationship, ...
     FROM residents r
     INNER JOIN survey_responses sr ON sr.id = (
         SELECT id FROM survey_responses
@@ -392,11 +557,25 @@ $res = $conn->query("
 
 Notice this uses `INNER JOIN` instead of `LEFT JOIN`: residents who never submitted a survey won't appear here, because there are no notes to show.
 
-The PHP loop then builds one card per resident, showing symptom badges and the typed notes.
+Each card carries the emergency contact in `data-` attributes. Clicking a card slides open a **detail panel** on the side showing the contact person's name, relationship, and phone number — pulled from the `ec_` fields of the survey.
 
 ---
 
-## 14. Logging Out (logout.php)
+## 16. Printable Blank Form (print_survey.php)
+
+A plain, printer-friendly version of the survey with empty lines and checkboxes — for residents who would rather fill it out on paper.
+
+```html
+<button class="pc-btn pc-btn-primary" onclick="window.print()">
+    <span class="material-icons">print</span> Print / Save as PDF
+</button>
+```
+
+It has no PHP logic — it's just a styled layout. The "Print Blank Form" button on [index.php](#5-resident-survey-form-indexphp) opens it, and `window.print()` brings up the browser's print dialog.
+
+---
+
+## 17. Logging Out (logout.php)
 
 ```php
 <?php
@@ -425,4 +604,8 @@ exit;
 | `htmlspecialchars()` | Cleans output so user-typed code can't run on the page (prevents XSS). |
 | JSON | A simple text format used to send data back from handlers to JavaScript. |
 | JOIN | A SQL way to combine data from two tables (residents + their surveys). |
-| CASCADE | Auto-delete related rows. Delete a resident → their surveys also vanish. |
+| CASCADE | Auto-delete related rows. Delete a resident → their survey also vanishes. |
+| UNIQUE KEY | A database rule that blocks duplicate rows (same person twice). |
+| `<=>` | MySQL's NULL-safe equality — compares values correctly even when one is empty (NULL). |
+| `BINARY` | Forces a case-sensitive text comparison in SQL. |
+| Emergency contact (`ec_`) | The person to call if something happens to the resident. |
