@@ -20,7 +20,11 @@ $ok_gender = ['Male','Female','Other'];
 $ok_purok  = ['Purok 1','Purok 2','Purok 3','Purok 4','Purok 5'];
 $name_re   = '/^[A-Za-z\s.\-\']+$/';
 
+// Middle name may be "N/A" when a person has no middle name.
+if (strcasecmp($middle, 'N/A') === 0) $middle = 'N/A';
+
 foreach (['First name' => $first, 'Middle name' => $middle, 'Last name' => $last] as $label => $val) {
+    if ($label === 'Middle name' && $val === 'N/A') continue;
     if ($val === '' || !preg_match($name_re, $val)) {
         echo json_encode(['success' => false, 'error' => "$label is required and may only contain letters, spaces, dots, hyphens, and apostrophes."]);
         exit;
@@ -38,7 +42,9 @@ if ($suffix !== '' && !preg_match('/^[A-Za-z.\s]{1,10}$/', $suffix)) {
     exit;
 }
 $suffix_db = $suffix !== '' ? $suffix : null;
-$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle $last"));
+// Exclude an "N/A" middle name from the displayed full name.
+$middle_name_part = ($middle === 'N/A') ? '' : $middle;
+$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle_name_part $last"));
 
 $stmt = $conn->prepare(
     "UPDATE residents

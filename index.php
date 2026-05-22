@@ -52,7 +52,12 @@
                     </div>
                     <div class="form-group">
                         <label>Middle Name <span class="required-star">*</span></label>
-                        <input type="text" name="middle_name" placeholder="Santos">
+                        <div class="input-with-na">
+                            <input type="text" name="middle_name" id="surveyMiddleName" placeholder="Santos">
+                            <label class="na-toggle" title="No middle name">
+                                <input type="checkbox" id="surveyMiddleNameNA"> N/A
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Last Name <span class="required-star">*</span></label>
@@ -173,7 +178,12 @@
                         </div>
                         <div class="form-group">
                             <label>Middle Name <span class="required-star">*</span></label>
-                            <input type="text" name="ec_middle_name" placeholder="Santos">
+                            <div class="input-with-na">
+                                <input type="text" name="ec_middle_name" id="ecMiddleName" placeholder="Santos">
+                                <label class="na-toggle" title="No middle name">
+                                    <input type="checkbox" id="ecMiddleNameNA"> N/A
+                                </label>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Last Name <span class="required-star">*</span></label>

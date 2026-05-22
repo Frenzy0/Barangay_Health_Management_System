@@ -38,8 +38,13 @@ $ok_rel    = ['Parent','Spouse','Sibling','Child','Grandparent','Relative','Guar
 $name_re = '/^[A-Za-z\s.\-\']+$/';
 $today_end = strtotime('today 23:59:59');
 
+// Middle name may be "N/A" when a person has no middle name.
+if (strcasecmp($middle, 'N/A') === 0)    $middle = 'N/A';
+if (strcasecmp($ec_middle, 'N/A') === 0) $ec_middle = 'N/A';
+
 // --- Resident name validation ---
 foreach (['First name' => $first, 'Middle name' => $middle, 'Last name' => $last] as $label => $val) {
+    if ($label === 'Middle name' && $val === 'N/A') continue;
     if ($val === '' || !preg_match($name_re, $val)) {
         echo json_encode(['success' => false, 'error' => "$label is required and may only contain letters, spaces, dots, hyphens, and apostrophes."]);
         exit;
@@ -50,7 +55,9 @@ if ($suffix !== '' && !preg_match('/^[A-Za-z.\s]{1,10}$/', $suffix)) {
     exit;
 }
 $suffix_db = $suffix !== '' ? $suffix : null;
-$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle $last"));
+// Exclude an "N/A" middle name from the displayed full name.
+$middle_name_part = ($middle === 'N/A') ? '' : $middle;
+$full_name = trim(preg_replace('/\s+/', ' ', "$first $middle_name_part $last"));
 
 if ($age < 1 || $age > 120) {
     echo json_encode(['success' => false, 'error' => 'Age must be between 1 and 120.']);
@@ -81,6 +88,7 @@ if (!in_array($gender, $ok_gender) || !in_array($purok, $ok_purok) || !in_array(
 foreach (['Contact person first name' => $ec_first,
           'Contact person middle name' => $ec_middle,
           'Contact person last name' => $ec_last] as $label => $val) {
+    if ($label === 'Contact person middle name' && $val === 'N/A') continue;
     if ($val === '' || !preg_match($name_re, $val)) {
         echo json_encode(['success' => false, 'error' => "$label is required and may only contain letters, spaces, dots, hyphens, and apostrophes."]);
         exit;

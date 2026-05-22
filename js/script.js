@@ -145,6 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 showError(el, err, label + " is required.");
                 showToast("error", "Invalid Name", label + " is required.");
                 valid = false;
+            } else if (idSuffix === "MiddleName" && val.toUpperCase() === "N/A") {
+                // Middle name may be "N/A" for a person with no middle name.
+                el.value = "N/A";
+                clearError(el, err);
             } else if (/\d/.test(val)) {
                 showError(el, err, label + " must not contain numbers.");
                 showToast("error", "Invalid Name", label + " must not contain numbers.");
@@ -521,7 +525,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const middle   = document.getElementById("editMiddleName").value.trim();
         const last     = document.getElementById("editLastName").value.trim();
         const suffix   = document.getElementById("editSuffix").value.trim();
-        const fullName = [first, middle, last].filter(Boolean).join(" ");
+        // "N/A" middle name is excluded from the displayed full name.
+        const fullName = [first, middle, last].filter(p => p && p.toUpperCase() !== "N/A").join(" ");
         const display  = suffix ? `${fullName} ${suffix}` : fullName;
 
         const fd = new FormData();
@@ -591,7 +596,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const middle   = document.getElementById("addMiddleName").value.trim();
         const last     = document.getElementById("addLastName").value.trim();
         const suffix   = document.getElementById("addSuffix").value.trim();
-        const fullName = [first, middle, last].filter(Boolean).join(" ");
+        // "N/A" middle name is excluded from the displayed full name.
+        const fullName = [first, middle, last].filter(p => p && p.toUpperCase() !== "N/A").join(" ");
         const display  = suffix ? `${fullName} ${suffix}` : fullName;
 
         const fd = new FormData();
@@ -773,6 +779,34 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        /* "No middle name" toggle — fills the field with N/A and locks it.
+           Uses readOnly (not disabled) so the value is still submitted. */
+        function bindNoMiddleName(inputId, cbId) {
+            const input = document.getElementById(inputId);
+            const cb = document.getElementById(cbId);
+            if (!input || !cb) return;
+            function sync() {
+                if (cb.checked) {
+                    input.value = "N/A";
+                    input.readOnly = true;
+                    input.classList.add("na-locked");
+                } else {
+                    if (input.value === "N/A") input.value = "";
+                    input.readOnly = false;
+                    input.classList.remove("na-locked");
+                }
+            }
+            cb.addEventListener("change", sync);
+            // Reset doesn't fire change events — re-sync after Clear Form.
+            surveyForm.addEventListener("reset", () => setTimeout(() => {
+                cb.checked = false;
+                sync();
+            }, 0));
+            sync();
+        }
+        bindNoMiddleName("surveyMiddleName", "surveyMiddleNameNA");
+        bindNoMiddleName("ecMiddleName", "ecMiddleNameNA");
+
         surveyForm.addEventListener("submit", e => {
             e.preventDefault();
 
@@ -802,6 +836,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!value) {
                     showToast("error", "Missing Field", `Please enter the ${label.toLowerCase()}.`);
                     return;
+                }
+                // Middle name may be "N/A" for residents with no middle name.
+                if (field === "middle_name" && value.toUpperCase() === "N/A") {
+                    const el = surveyForm.querySelector(`[name="${field}"]`);
+                    if (el) el.value = "N/A";
+                    fd.set(field, "N/A");
+                    continue;
                 }
                 if (!nameRe.test(value)) {
                     showToast("error", `Invalid ${label}`, `${label} may only contain letters, spaces, dots, hyphens, and apostrophes.`);
@@ -895,6 +936,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!value) {
                     showToast("error", "Missing Field", `Please enter the contact person's ${label.toLowerCase()}.`);
                     return;
+                }
+                // Middle name may be "N/A" for a contact person with no middle name.
+                if (field === "ec_middle_name" && value.toUpperCase() === "N/A") {
+                    const el = surveyForm.querySelector(`[name="${field}"]`);
+                    if (el) el.value = "N/A";
+                    fd.set(field, "N/A");
+                    continue;
                 }
                 if (!nameRe.test(value)) {
                     showToast("error", `Invalid ${label}`, `${label} may only contain letters, spaces, dots, hyphens, and apostrophes.`);
