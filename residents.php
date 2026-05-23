@@ -121,6 +121,10 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
                 <div class="search-box">
                     <span class="material-icons">search</span>
                     <input type="text" id="residentSearch" placeholder="Search by name...">
+                    <button type="button" class="search-filter-btn" id="residentFilterBtn"
+                            title="Sort by surname (A–Z)" aria-pressed="false" aria-label="Sort by surname">
+                        <span class="material-icons">sort_by_alpha</span>
+                    </button>
                 </div>
                 <div class="export-group">
                     <a href="handlers/export_residents.php?format=csv" class="btn btn-export">

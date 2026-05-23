@@ -375,6 +375,49 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        /* Sort-by-surname filter: A–Z sort with "Last, First Middle [Suffix]"
+           display in the card heading. Click again to restore. */
+        const notesFilterBtn = document.getElementById("notesFilterBtn");
+        if (notesFilterBtn) {
+            let sortActive = false;
+            let originalOrder = null;
+
+            // The note cards bake the suffix into data-fullname, so the
+            // original display is just data-fullname (no suffix re-append).
+            function setCardHeading(card, text) {
+                const h = card.querySelector(".note-identity h3");
+                if (h) h.textContent = text;
+            }
+
+            notesFilterBtn.addEventListener("click", () => {
+                const cards = Array.from(grid.querySelectorAll(".note-card"));
+                if (cards.length === 0) return;
+
+                if (!sortActive) {
+                    originalOrder = cards.slice();
+                    cards.slice().sort(compareBySurname).forEach(c => {
+                        grid.appendChild(c);
+                        setCardHeading(c, buildSurnameFirst(c));
+                    });
+                    sortActive = true;
+                    notesFilterBtn.classList.add("active");
+                    notesFilterBtn.setAttribute("aria-pressed", "true");
+                    notesFilterBtn.title = "Sorted by surname (A–Z) — click to restore";
+                } else {
+                    originalOrder.forEach(c => {
+                        grid.appendChild(c);
+                        setCardHeading(c, c.dataset.fullname || "");
+                    });
+                    sortActive = false;
+                    notesFilterBtn.classList.remove("active");
+                    notesFilterBtn.setAttribute("aria-pressed", "false");
+                    notesFilterBtn.title = "Sort by surname (A–Z)";
+                }
+                currentPage = 1;
+                renderPagination();
+            });
+        }
+
         renderPagination();
     })();
 
@@ -486,6 +529,87 @@ document.addEventListener("DOMContentLoaded", () => {
                     row.dataset.searchHidden = "1";
                 }
             });
+            residentPg?.goFirst();
+        });
+    }
+
+    /* =============================================
+       SORT-BY-SURNAME FILTER (Residents)
+       Toggle: click once to sort A–Z by surname and
+       display names as "Last, First Middle [Suffix]".
+       Click again to restore the original order and
+       the original "First Middle Last" display.
+    ============================================= */
+    // Sort uses the actual last_name column when present (correct for
+    // compound Filipino surnames like "Dela Cruz"); falls back to a
+    // best-effort surname split for cards/rows without parts.
+    function surnameKey(el) {
+        const last = (el.dataset.lastname || "").trim();
+        if (last) return last.toLowerCase();
+        return extractSurname(el.dataset.fullname || "");
+    }
+    function compareBySurname(a, b) {
+        const cmp = surnameKey(a).localeCompare(surnameKey(b));
+        if (cmp !== 0) return cmp;
+        const fa = (a.dataset.firstname || a.dataset.fullname || "").toLowerCase();
+        const fb = (b.dataset.firstname || b.dataset.fullname || "").toLowerCase();
+        return fa.localeCompare(fb);
+    }
+    // "Last, First Middle [Suffix]" — middle is omitted when "N/A".
+    function buildSurnameFirst(el) {
+        const last   = (el.dataset.lastname   || "").trim();
+        const first  = (el.dataset.firstname  || "").trim();
+        const middle = (el.dataset.middlename || "").trim();
+        const suffix = (el.dataset.suffix     || "").trim();
+        const middlePart = (middle && middle.toUpperCase() !== "N/A") ? " " + middle : "";
+        const suffixPart = suffix ? " " + suffix : "";
+        const rest = `${first}${middlePart}${suffixPart}`.trim();
+        return last ? (rest ? `${last}, ${rest}` : last) : rest;
+    }
+
+    const residentFilterBtn = document.getElementById("residentFilterBtn");
+    if (residentFilterBtn) {
+        const tbody = document.getElementById("residentTable");
+        let sortActive = false;
+        let originalOrder = null;
+
+        // The residents table stores data-fullname WITHOUT the suffix, so
+        // the original display = fullname + " " + suffix (when present).
+        function originalResidentDisplay(row) {
+            const full   = row.dataset.fullname || "";
+            const suffix = (row.dataset.suffix || "").trim();
+            return suffix ? `${full} ${suffix}` : full;
+        }
+        function setNameCell(row, text) {
+            const cell = row.querySelector('td[data-label="Name"]');
+            if (cell) cell.textContent = text;
+        }
+
+        residentFilterBtn.addEventListener("click", () => {
+            if (!tbody) return;
+            const dataRows = Array.from(tbody.querySelectorAll("tr")).filter(r => !r.id);
+            if (dataRows.length === 0) return;
+
+            if (!sortActive) {
+                originalOrder = dataRows.slice();
+                dataRows.slice().sort(compareBySurname).forEach(r => {
+                    tbody.appendChild(r);
+                    setNameCell(r, buildSurnameFirst(r));
+                });
+                sortActive = true;
+                residentFilterBtn.classList.add("active");
+                residentFilterBtn.setAttribute("aria-pressed", "true");
+                residentFilterBtn.title = "Sorted by surname (A–Z) — click to restore";
+            } else {
+                originalOrder.forEach(r => {
+                    tbody.appendChild(r);
+                    setNameCell(r, originalResidentDisplay(r));
+                });
+                sortActive = false;
+                residentFilterBtn.classList.remove("active");
+                residentFilterBtn.setAttribute("aria-pressed", "false");
+                residentFilterBtn.title = "Sort by surname (A–Z)";
+            }
             residentPg?.goFirst();
         });
     }

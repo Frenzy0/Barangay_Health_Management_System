@@ -3,7 +3,8 @@ require 'auth.php';
 require 'db.php';
 
 $res = $conn->query("
-    SELECT r.id, r.full_name, r.suffix, r.gender, r.purok,
+    SELECT r.id, r.first_name, r.middle_name, r.last_name,
+           r.full_name, r.suffix, r.gender, r.purok,
            sr.vaccination_status,
            sr.has_fever, sr.has_cough, sr.has_fatigue, sr.has_headache, sr.no_symptoms,
            sr.last_checkup, sr.health_notes, sr.submitted_at,
@@ -120,6 +121,10 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
             <div class="search-box">
                 <span class="material-icons">search</span>
                 <input type="text" id="notesSearch" placeholder="Search by name...">
+                <button type="button" class="search-filter-btn" id="notesFilterBtn"
+                        title="Sort by surname (A–Z)" aria-pressed="false" aria-label="Sort by surname">
+                    <span class="material-icons">sort_by_alpha</span>
+                </button>
             </div>
             
         </div>
@@ -164,6 +169,10 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
             <div class="note-card" tabindex="0" role="button"
                  data-name="<?= htmlspecialchars(strtolower($row_display)) ?>"
                  data-fullname="<?= htmlspecialchars($row_display, ENT_QUOTES) ?>"
+                 data-firstname="<?= htmlspecialchars($row['first_name'] ?? '', ENT_QUOTES) ?>"
+                 data-middlename="<?= htmlspecialchars($row['middle_name'] ?? '', ENT_QUOTES) ?>"
+                 data-lastname="<?= htmlspecialchars($row['last_name'] ?? '', ENT_QUOTES) ?>"
+                 data-suffix="<?= htmlspecialchars($row_suffix, ENT_QUOTES) ?>"
                  data-purok="<?= htmlspecialchars($row['purok'] ?? '', ENT_QUOTES) ?>"
                  data-gender="<?= htmlspecialchars($row['gender'] ?? '', ENT_QUOTES) ?>"
                  data-ec-name="<?= htmlspecialchars($ec_name, ENT_QUOTES) ?>"

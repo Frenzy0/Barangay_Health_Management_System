@@ -366,6 +366,34 @@ html.sb-preload .sidebar-backdrop{
     background:transparent;
 }
 
+.search-filter-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    color:#64748b;
+    padding:4px;
+    border-radius:6px;
+    transition:background .15s ease, color .15s ease;
+}
+.search-filter-btn:hover{
+    color:#0f172a;
+    background:#e2e8f0;
+}
+.search-filter-btn.active{
+    color:#fff;
+    background:#0d9488;
+}
+.search-filter-btn.active:hover{
+    background:#0f766e;
+}
+.search-filter-btn .material-icons{
+    font-size:20px;
+}
+
 /* ================= TABLE ================= */
 table{
     width:100%;
