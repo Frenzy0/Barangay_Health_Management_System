@@ -145,12 +145,13 @@ $notes_data = $res->fetch_all(MYSQLI_ASSOC);
                 $row_suffix  = trim($row['suffix'] ?? '');
                 $row_display = $row_suffix !== '' ? $row['full_name'] . ' ' . $row_suffix : $row['full_name'];
 
-                // Emergency contact (from the latest survey response)
-                $ec_name = trim(implode(' ', array_filter([
-                    trim((string)($row['ec_first_name']  ?? '')),
-                    trim((string)($row['ec_middle_name'] ?? '')),
-                    trim((string)($row['ec_last_name']   ?? '')),
-                ])));
+                // Emergency contact (from the latest survey response).
+                // An "N/A" middle name is excluded from the displayed name.
+                $ec_first_part  = trim((string)($row['ec_first_name']  ?? ''));
+                $ec_middle_part = trim((string)($row['ec_middle_name'] ?? ''));
+                $ec_last_part   = trim((string)($row['ec_last_name']   ?? ''));
+                if (strcasecmp($ec_middle_part, 'N/A') === 0) $ec_middle_part = '';
+                $ec_name = trim(preg_replace('/\s+/', ' ', "$ec_first_part $ec_middle_part $ec_last_part"));
                 $ec_rel    = trim((string)($row['ec_relationship']   ?? ''));
                 $ec_number = trim((string)($row['ec_contact_number'] ?? ''));
 
