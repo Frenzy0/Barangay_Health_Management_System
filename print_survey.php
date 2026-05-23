@@ -10,7 +10,8 @@
 <body>
 
 <div class="print-controls">
-    <a href="index.php" class="pc-btn pc-btn-secondary">
+    <a href="index.php" class="pc-btn pc-btn-secondary"
+       onclick="window.close(); return false;">
         <span class="material-icons">arrow_back</span> Back
     </a>
     <button class="pc-btn pc-btn-primary" onclick="window.print()">

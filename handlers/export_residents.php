@@ -133,7 +133,8 @@ logAction($conn, 'Exported residents', 'PDF', "$total record(s)");
 <body>
 
 <div class="print-controls">
-    <a href="../residents.php" class="pc-btn pc-btn-secondary">
+    <a href="../residents.php" class="pc-btn pc-btn-secondary"
+       onclick="window.close(); return false;">
         <span class="material-icons">arrow_back</span> Back
     </a>
     <button class="pc-btn pc-btn-primary" onclick="window.print()">

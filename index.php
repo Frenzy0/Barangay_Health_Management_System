@@ -216,7 +216,8 @@
 
         <!-- BUTTONS -->
         <div class="form-actions">
-            <a href="print_survey.php" target="_blank" class="btn btn-outline">
+            <a href="print_survey.php" class="btn btn-outline"
+               onclick="window.open(this.href, '_blank'); return false;">
                 <span class="material-icons">print</span> Print Blank Form
             </a>
             <button type="reset" class="btn btn-secondary">Clear Form</button>

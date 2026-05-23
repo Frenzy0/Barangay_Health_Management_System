@@ -131,7 +131,8 @@ $residents = $res->fetch_all(MYSQLI_ASSOC);
                         <span class="material-icons">table_view</span>
                         Export CSV
                     </a>
-                    <a href="handlers/export_residents.php?format=pdf" target="_blank" rel="noopener" class="btn btn-export">
+                    <a href="handlers/export_residents.php?format=pdf" class="btn btn-export"
+                       onclick="window.open(this.href, '_blank'); return false;">
                         <span class="material-icons">picture_as_pdf</span>
                         Export PDF
                     </a>
