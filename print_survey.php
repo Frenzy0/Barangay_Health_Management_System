@@ -141,9 +141,53 @@
         </div>
     </div>
 
-    <!-- SECTION 3: CERTIFICATION -->
+    <!-- SECTION 3: EMERGENCY CONTACT -->
     <div class="section">
-        <h3>3. CERTIFICATION</h3>
+        <h3>3. EMERGENCY CONTACT</h3>
+
+        <div class="row">
+            <label>Contact Person — Full Name:</label>
+            <div class="row-inline" style="margin-top:4px;">
+                <div>
+                    <span class="line medium" style="width:100%;"></span>
+                    <div class="note">First Name</div>
+                </div>
+                <div>
+                    <span class="line medium" style="width:100%;"></span>
+                    <div class="note">Middle Name</div>
+                </div>
+                <div>
+                    <span class="line medium" style="width:100%;"></span>
+                    <div class="note">Last Name</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row-inline">
+            <div>
+                <label>Contact Number:</label>
+                <span class="line medium"></span>
+                <div class="note">(11 digits, e.g. 09171234567)</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label>Relationship to Contact Person:</label>
+            <div class="options">
+                <span class="opt"><span class="checkbox"></span> Parent</span>
+                <span class="opt"><span class="checkbox"></span> Spouse</span>
+                <span class="opt"><span class="checkbox"></span> Sibling</span>
+                <span class="opt"><span class="checkbox"></span> Child</span>
+                <span class="opt"><span class="checkbox"></span> Grandparent</span>
+                <span class="opt"><span class="checkbox"></span> Relative</span>
+                <span class="opt"><span class="checkbox"></span> Guardian</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: CERTIFICATION -->
+    <div class="section">
+        <h3>4. CERTIFICATION</h3>
         <p style="font-size:11px;margin:0 0 14px;">
             I hereby certify that the information provided in this form is true and correct
             to the best of my knowledge.
