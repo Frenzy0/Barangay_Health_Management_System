@@ -846,6 +846,46 @@ document.addEventListener("DOMContentLoaded", () => {
     ============================================= */
     const surveyForm = document.getElementById("surveyForm");
     if (surveyForm) {
+        /* Data Privacy Act of 2012 modal — open from consent links,
+           close from the X / Close buttons, and "I Agree" ticks the
+           consent checkbox automatically. */
+        const privacyModal = document.getElementById("privacyModal");
+        const consentCb    = document.getElementById("consentCheckbox");
+        const agreeBtn     = document.getElementById("agreePrivacyBtn");
+
+        if (privacyModal) {
+            ["openPrivacyModal", "openPrivacyModalLink"].forEach(id => {
+                document.getElementById(id)?.addEventListener("click", e => {
+                    e.preventDefault();
+                    openModal(privacyModal);
+                });
+            });
+
+            document.querySelectorAll(".closePrivacyModal").forEach(btn =>
+                btn.addEventListener("click", () => closeModal(privacyModal))
+            );
+
+            privacyModal.addEventListener("click", e => {
+                if (e.target === privacyModal) closeModal(privacyModal);
+            });
+
+            agreeBtn?.addEventListener("click", () => {
+                if (consentCb) consentCb.checked = true;
+                closeModal(privacyModal);
+            });
+
+            document.addEventListener("keydown", e => {
+                if (e.key === "Escape" && privacyModal.classList.contains("show")) {
+                    closeModal(privacyModal);
+                }
+            });
+        }
+
+        // Re-tick consent every submission — reset doesn't fire on hidden checkbox state otherwise.
+        surveyForm.addEventListener("reset", () => {
+            if (consentCb) setTimeout(() => { consentCb.checked = false; }, 0);
+        });
+
         /* "None" symptom mutually-exclusive logic (bidirectional) */
         const noneCb = surveyForm.querySelector('input[name="symptoms[]"][value="none"]');
         const otherCbs = surveyForm.querySelectorAll('input[name="symptoms[]"]:not([value="none"])');
@@ -1095,6 +1135,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (!ecRel) {
                 showToast("error", "Missing Field", "Please select the relationship to the contact person.");
+                return;
+            }
+
+            if (consentCb && !consentCb.checked) {
+                showToast("error", "Consent Required",
+                    "Please review and accept the Terms of Service and Data Privacy Act of 2012 to submit the survey.");
                 return;
             }
 

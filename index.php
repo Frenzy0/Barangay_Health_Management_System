@@ -214,6 +214,20 @@
             </div>
         </div>
 
+        <!-- CONSENT -->
+        <div class="survey-card consent-card">
+            <label class="consent-label">
+                <input type="checkbox" id="consentCheckbox" name="consent">
+                <span>
+                    I have read and agree to the
+                    <a href="#" id="openPrivacyModal" class="consent-link">Terms of Service</a>
+                    and consent to the collection and processing of my personal
+                    information in accordance with the
+                    <a href="#" id="openPrivacyModalLink" class="consent-link">Data Privacy Act of 2012 (RA 10173)</a>.
+                </span>
+            </label>
+        </div>
+
         <!-- BUTTONS -->
         <div class="form-actions">
             <a href="print_survey.php" class="btn btn-outline"
@@ -225,6 +239,89 @@
         </div>
 
     </form>
+
+    <!-- DATA PRIVACY ACT MODAL -->
+    <div class="modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+        <div class="modal-content privacy-modal">
+            <div class="modal-header">
+                <div class="modal-header-icon privacy-header-icon">
+                    <span class="material-icons-outlined">privacy_tip</span>
+                </div>
+                <div>
+                    <h3 id="privacyModalTitle">Data Privacy Act of 2012</h3>
+                    <p>Republic Act No. 10173 &mdash; Terms of Service &amp; Privacy Notice</p>
+                </div>
+                <button type="button" class="modal-close-btn closePrivacyModal" aria-label="Close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <div class="privacy-body">
+                <h4>1. Purpose of Collection</h4>
+                <p>
+                    The Barangay Health Monitoring System (BHMS) collects your
+                    personal and health information solely for the purpose of
+                    delivering barangay health services, maintaining accurate
+                    resident health records, monitoring community health trends,
+                    and responding to medical emergencies.
+                </p>
+
+                <h4>2. Information We Collect</h4>
+                <ul>
+                    <li>Personal details (name, birthdate, age, civil status, gender, address/purok)</li>
+                    <li>Health information (vaccination status, recent symptoms, last checkup, health notes)</li>
+                    <li>Emergency contact details (name, relationship, contact number)</li>
+                </ul>
+
+                <h4>3. Your Rights as a Data Subject</h4>
+                <p>
+                    Under RA 10173, you have the right to be informed, to
+                    object, to access, to rectify, to erase or block, to
+                    damages, to data portability, and to file a complaint with
+                    the National Privacy Commission (NPC) regarding the
+                    processing of your personal data.
+                </p>
+
+                <h4>4. Data Protection &amp; Storage</h4>
+                <p>
+                    Your information is stored securely and accessed only by
+                    authorized barangay health personnel. We implement
+                    reasonable organizational, physical, and technical security
+                    measures to protect your data against unauthorized access,
+                    alteration, disclosure, or destruction.
+                </p>
+
+                <h4>5. Sharing of Information</h4>
+                <p>
+                    Your information will not be shared with third parties
+                    without your consent, except as required by law, public
+                    health authorities, or in response to a legitimate medical
+                    emergency.
+                </p>
+
+                <h4>6. Retention</h4>
+                <p>
+                    Your data will be retained only for as long as necessary to
+                    fulfill the purposes stated above, or as required by
+                    applicable laws and regulations.
+                </p>
+
+                <h4>7. Consent</h4>
+                <p>
+                    By ticking the consent checkbox and submitting this survey,
+                    you confirm that you have read and understood this notice,
+                    and you freely give your consent to the collection,
+                    processing, and storage of your personal information for
+                    the purposes described above.
+                </p>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary closePrivacyModal">Close</button>
+                <button type="button" class="btn btn-primary" id="agreePrivacyBtn">I Agree</button>
+            </div>
+        </div>
+    </div>
 
 </main>
 
