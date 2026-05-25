@@ -259,7 +259,7 @@
             <div class="privacy-body">
                 <h4>1. Purpose of Collection</h4>
                 <p>
-                    The Barangay Health Monitoring System (BHMS) collects your
+                    The Barangay Health Management System (BHMS) collects your
                     personal and health information solely for the purpose of
                     delivering barangay health services, maintaining accurate
                     resident health records, monitoring community health trends,
